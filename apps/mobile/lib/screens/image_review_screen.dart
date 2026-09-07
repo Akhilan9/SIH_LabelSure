@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../core/api_service.dart';
 import '../core/constants.dart';
 import '../core/storage_service.dart';
@@ -33,6 +34,38 @@ class _ImageReviewScreenState extends State<ImageReviewScreen> {
   void initState() {
     super.initState();
     _images = List.from(widget.capturedImages);
+  }
+
+  Future<void> _captureAnotherPanel() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? photo = await picker.pickImage(
+        source: ImageSource.camera,
+        maxWidth: 2400,
+        maxHeight: 2400,
+        imageQuality: 92,
+      );
+      if (photo != null) {
+        final bytes = await photo.readAsBytes();
+        final List<String> viewTypes = ['FRONT', 'BACK', 'MRP_PANEL', 'SIDE', 'TOP', 'BOTTOM'];
+        final currentCount = _images.length;
+        final nextView = currentCount < viewTypes.length ? viewTypes[currentCount] : 'ADDITIONAL';
+        setState(() {
+          _images.add({
+            'bytes': bytes,
+            'view_type': nextView,
+            'name': photo.name,
+            'path': photo.path,
+          });
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Camera capture error: $e')),
+        );
+      }
+    }
   }
 
   Future<void> _uploadAndAnalyze() async {
@@ -285,28 +318,53 @@ class _ImageReviewScreenState extends State<ImageReviewScreen> {
             ),
           ),
 
-          // Bottom Action
+          // Bottom Actions
           Container(
             padding: const EdgeInsets.all(16),
             color: Colors.white,
-            child: ElevatedButton(
-              onPressed: (_isUploading || _images.isEmpty) ? null : _uploadAndAnalyze,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              ),
-              child: _isUploading
-                  ? const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)),
-                        SizedBox(width: 10),
-                        Text('Uploading Evidence to Central Server...'),
-                      ],
-                    )
-                  : const Text('Upload & Run AI Compliance Analysis ->', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (!_isUploading) ...[
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: _captureAnotherPanel,
+                      icon: const Icon(Icons.add_a_photo_outlined, size: 18),
+                      label: const Text('+ Photograph Another Angle (Back / MRP Panel)'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        side: const BorderSide(color: AppColors.border),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                ],
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: (_isUploading || _images.isEmpty) ? null : _uploadAndAnalyze,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    child: _isUploading
+                        ? const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)),
+                              SizedBox(width: 10),
+                              Text('Uploading Evidence to Central Server...'),
+                            ],
+                          )
+                        : const Text('Upload & Run AI Compliance Analysis ->', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

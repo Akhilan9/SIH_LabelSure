@@ -100,6 +100,9 @@ class _CameraScreenState extends State<CameraScreen> {
             name: photo.name,
             path: photo.path,
           );
+          if (mounted) _proceedToReview();
+        } else if (_capturedImages.isEmpty && mounted) {
+          Navigator.pop(context);
         }
       }
     } catch (e) {
@@ -216,34 +219,25 @@ class _CameraScreenState extends State<CameraScreen> {
                         Positioned.fill(
                           child: _webcam.buildPreview(),
                         )
-                      else
-                        Center(
+                      else if (_capturedImages.isEmpty)
+                        const Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              GestureDetector(
-                                onTap: _isCapturing ? null : _capturePhoto,
-                                child: Container(
-                                  padding: const EdgeInsets.all(24),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primary.withOpacity(0.2),
-                                    shape: BoxShape.circle,
-                                    border: Border.all(color: AppColors.primary, width: 2.5),
-                                  ),
-                                  child: const Icon(Icons.camera_alt, color: Colors.white, size: 52),
-                                ),
-                              ),
-                              const SizedBox(height: 16),
+                              CircularProgressIndicator(color: AppColors.primary),
+                              SizedBox(height: 16),
                               Text(
-                                'Tap to Photograph $_activeViewType Panel',
-                                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 4),
-                              const Text(
-                                'Launches camera to capture high-res packaging shot',
-                                style: TextStyle(color: Colors.white54, fontSize: 10),
+                                'Opening Camera Directly...',
+                                style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
                               ),
                             ],
+                          ),
+                        )
+                      else
+                        Positioned.fill(
+                          child: Image.memory(
+                            _capturedImages.last['bytes'] as Uint8List,
+                            fit: BoxFit.contain,
                           ),
                         ),
 

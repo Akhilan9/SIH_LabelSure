@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../core/api_service.dart';
 import '../core/constants.dart';
 import '../core/sync_manager.dart';
 import 'camera_screen.dart';
+import 'image_review_screen.dart';
 import 'gallery_screen.dart';
 
 class ProductContextScreen extends StatefulWidget {
@@ -105,20 +107,46 @@ class _ProductContextScreenState extends State<ProductContextScreen> {
             ),
             const SizedBox(height: 20),
             ElevatedButton.icon(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pop(ctx);
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => CameraScreen(
-                      inspectionId: widget.inspectionId,
-                      inspectionNumber: widget.inspectionNumber,
-                    ),
-                  ),
-                );
+                try {
+                  final ImagePicker picker = ImagePicker();
+                  final XFile? photo = await picker.pickImage(
+                    source: ImageSource.camera,
+                    maxWidth: 2400,
+                    maxHeight: 2400,
+                    imageQuality: 92,
+                  );
+                  if (photo != null && context.mounted) {
+                    final bytes = await photo.readAsBytes();
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ImageReviewScreen(
+                          inspectionId: widget.inspectionId,
+                          inspectionNumber: widget.inspectionNumber,
+                          capturedImages: [
+                            {
+                              'bytes': bytes,
+                              'view_type': 'FRONT',
+                              'name': photo.name,
+                              'path': photo.path,
+                            }
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Camera error: $e')),
+                    );
+                  }
+                }
               },
               icon: const Icon(Icons.camera_alt),
-              label: const Text('Open Camera Viewfinder'),
+              label: const Text('Open Camera Directly'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
