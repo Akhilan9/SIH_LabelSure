@@ -204,14 +204,40 @@ class _CameraScreenState extends State<CameraScreen> {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      // Layer 1: Live Video Feed
+                      // Layer 1: Live Video Feed or Native Camera Trigger
                       if (_webcam.isSupported)
                         Positioned.fill(
                           child: _webcam.buildPreview(),
                         )
                       else
-                        const Center(
-                          child: Icon(Icons.camera_alt, color: Colors.white24, size: 64),
+                        Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              GestureDetector(
+                                onTap: _isCapturing ? null : _capturePhoto,
+                                child: Container(
+                                  padding: const EdgeInsets.all(24),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary.withOpacity(0.2),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: AppColors.primary, width: 2.5),
+                                  ),
+                                  child: const Icon(Icons.camera_alt, color: Colors.white, size: 52),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Tap to Photograph $_activeViewType Panel',
+                                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 4),
+                              const Text(
+                                'Launches camera to capture high-res packaging shot',
+                                style: TextStyle(color: Colors.white54, fontSize: 10),
+                              ),
+                            ],
+                          ),
                         ),
 
                       // Layer 2: Shutter Flash Effect
@@ -420,9 +446,9 @@ class _CameraScreenState extends State<CameraScreen> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    _webcam.isInitialized
+                    _webcam.isSupported && _webcam.isInitialized
                         ? 'Tap Camera to capture live webcam frame'
-                        : 'Webcam active. Or tap gallery to select sample photos.',
+                        : 'Tap Shutter to photograph package or Gallery to pick photo',
                     style: const TextStyle(color: Colors.white54, fontSize: 11),
                   ),
                 ],
