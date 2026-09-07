@@ -148,6 +148,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   runSpacing: 6,
                   children: [
                     ActionChip(
+                      avatar: const Icon(Icons.cloud_done, size: 14, color: Colors.green),
+                      label: const Text('Live AI Cloud (labelsure-ai.loca.lt)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                      onPressed: () {
+                        setState(() {
+                          _urlController.text = 'https://labelsure-ai.loca.lt';
+                          _storage.setBaseUrl('https://labelsure-ai.loca.lt');
+                        });
+                      },
+                    ),
+                    ActionChip(
                       avatar: const Icon(Icons.wifi, size: 14),
                       label: const Text('PC WiFi (192.168.0.219)', style: TextStyle(fontSize: 11)),
                       onPressed: () {

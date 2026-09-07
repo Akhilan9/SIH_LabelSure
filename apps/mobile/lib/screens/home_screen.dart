@@ -108,7 +108,7 @@ class _MobileHomeScreenState extends State<MobileHomeScreen> {
             'is_food': true,
             'origin_country': 'India',
           }
-        }).timeout(const Duration(milliseconds: 2000));
+        }).timeout(const Duration(seconds: 10));
         inspectionId = inspection.id;
         inspectionNumber = inspection.inspectionNumber;
       } catch (_) {

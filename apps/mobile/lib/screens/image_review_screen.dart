@@ -72,117 +72,142 @@ class _ImageReviewScreenState extends State<ImageReviewScreen> {
     if (_images.isEmpty) return;
 
     final user = StorageService().currentUser;
-    final isOfflineMode = !SyncManager().isOnline ||
-        user?.badgeNumber == 'DL-LM-OFFLINE' ||
-        user?.id == 'usr_offline_demo' ||
-        SyncManager().getInspection(widget.inspectionId) != null ||
-        widget.inspectionId.startsWith('OFFLINE-');
+    final bool isExplicitOffline = user?.badgeNumber == 'DL-LM-OFFLINE' ||
+        user?.id == 'usr_offline_demo';
 
-    if (isOfflineMode) {
-      var insp = SyncManager().getInspection(widget.inspectionId) ??
-          SyncManager().createOfflineInspection(
-            commodityName: 'Package Inspection (${widget.inspectionNumber})',
-            notes: 'Captured via Direct Camera Scan',
-          );
+    // Check if we can communicate with backend
+    final bool isOnline = !isExplicitOffline && SyncManager().isOnline;
 
-      // Offline-First Sync Workflow
-      for (final img in _images) {
-        final filePath = (img['path'] ?? img['name'] ?? 'offline_img.jpg') as String;
-        final bytes = img['bytes'] as Uint8List?;
-        SyncManager().addOfflineImage(
-          localId: insp.localId,
-          viewType: (img['view_type'] ?? 'FRONT') as String,
-          filePath: filePath,
-          base64Data: bytes != null ? base64Encode(bytes) : null,
-          filename: (img['name'] ?? 'evidence.jpg') as String,
-        );
-      }
-      SyncManager().queueForSync(insp.localId);
+    String currentInspectionId = widget.inspectionId;
+    String currentInspectionNumber = widget.inspectionNumber;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('📦 Package images saved locally. Running on-device compliance analysis...'),
-          backgroundColor: AppColors.primary,
-        ),
-      );
+    if (isOnline) {
+      setState(() {
+        _isUploading = true;
+        _uploadProgress = 0.0;
+        _uploadStatusText = 'Connecting to AI compliance server...';
+      });
 
-      // Navigate to real-time Analysis Screen
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => AnalysisScreen(
-            inspectionId: insp.localId,
-            inspectionNumber: widget.inspectionNumber,
-          ),
-        ),
-      );
-      return;
-    }
+      try {
+        // If inspection was created as offline/local, ensure a server inspection exists
+        if (currentInspectionId.startsWith('local_') ||
+            currentInspectionId.startsWith('OFFLINE-') ||
+            currentInspectionId.startsWith('insp_offline_')) {
+          final serverInsp = await ApiService().createInspection({
+            'commodity_name': 'Scanned Commodity Evidence',
+            'rule_version': 'LMPC-2026-RULES',
+            'notes': 'Captured via Direct Camera Scan',
+            'context': {
+              'commodity_category': 'FOOD',
+              'is_food': true,
+              'origin_country': 'India',
+            }
+          });
+          currentInspectionId = serverInsp.id;
+          currentInspectionNumber = serverInsp.inspectionNumber;
+        }
 
-    setState(() {
-      _isUploading = true;
-      _uploadProgress = 0.0;
-      _uploadStatusText = 'Starting statutory evidence upload...';
-    });
+        final total = _images.length;
+        for (var i = 0; i < total; i++) {
+          final img = _images[i];
+          final viewType = (img['view_type'] ?? 'FRONT') as String;
+          final fileName = (img['name'] ?? 'evidence_${i + 1}.jpg') as String;
 
-    try {
-      final total = _images.length;
-      for (var i = 0; i < total; i++) {
-        final img = _images[i];
-        final viewType = (img['view_type'] ?? 'FRONT') as String;
-        final fileName = (img['name'] ?? 'evidence_${i + 1}.jpg') as String;
+          setState(() {
+            _uploadStatusText = 'Uploading $viewType evidence (${i + 1}/$total)...';
+            _uploadProgress = (i + 1) / total;
+          });
 
-        setState(() {
-          _uploadStatusText = 'Uploading $viewType evidence (${i + 1}/$total)...';
-          _uploadProgress = (i + 1) / total;
-        });
+          if (img['bytes'] != null) {
+            await ApiService().uploadImageBytes(
+              inspectionId: currentInspectionId,
+              bytes: img['bytes'] as Uint8List,
+              fileName: fileName,
+              viewType: viewType,
+            );
+          } else if (img['path'] != null) {
+            await ApiService().uploadImage(
+              currentInspectionId,
+              img['path'] as String,
+              viewType,
+            );
+          }
+        }
 
-        if (img['bytes'] != null) {
-          await ApiService().uploadImageBytes(
-            inspectionId: widget.inspectionId,
-            bytes: img['bytes'] as Uint8List,
-            fileName: fileName,
-            viewType: viewType,
-          );
-        } else if (img['path'] != null) {
-          await ApiService().uploadImage(
-            widget.inspectionId,
-            img['path'] as String,
-            viewType,
+        // Also cache evidence locally in SyncManager for instant RuleLens access
+        var insp = SyncManager().getInspection(currentInspectionId) ??
+            SyncManager().createOfflineInspection(
+              commodityName: 'Package Inspection ($currentInspectionNumber)',
+              notes: 'Captured via Direct Camera Scan',
+            );
+        for (final img in _images) {
+          final filePath = (img['path'] ?? img['name'] ?? 'evidence.jpg') as String;
+          final bytes = img['bytes'] as Uint8List?;
+          SyncManager().addOfflineImage(
+            localId: insp.localId,
+            viewType: (img['view_type'] ?? 'FRONT') as String,
+            filePath: filePath,
+            base64Data: bytes != null ? base64Encode(bytes) : null,
+            filename: (img['name'] ?? 'evidence.jpg') as String,
           );
         }
+
+        if (!mounted) return;
+
+        // Navigate to real-time Analysis Screen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => AnalysisScreen(
+              inspectionId: currentInspectionId,
+              inspectionNumber: currentInspectionNumber,
+            ),
+          ),
+        );
+        return;
+      } catch (e) {
+        // Fall back to offline flow below
       }
+    }
 
-      if (!mounted) return;
+    // Offline-First Fallback Workflow
+    var insp = SyncManager().getInspection(widget.inspectionId) ??
+        SyncManager().createOfflineInspection(
+          commodityName: 'Package Inspection (${widget.inspectionNumber})',
+          notes: 'Captured via Direct Camera Scan',
+        );
 
-      // Navigate to real-time Analysis Screen
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => AnalysisScreen(
-            inspectionId: widget.inspectionId,
-            inspectionNumber: widget.inspectionNumber,
-          ),
-        ),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('⚡ Central server unreachable. Switched to offline field evaluation.'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => AnalysisScreen(
-            inspectionId: widget.inspectionId,
-            inspectionNumber: widget.inspectionNumber,
-          ),
-        ),
+    for (final img in _images) {
+      final filePath = (img['path'] ?? img['name'] ?? 'offline_img.jpg') as String;
+      final bytes = img['bytes'] as Uint8List?;
+      SyncManager().addOfflineImage(
+        localId: insp.localId,
+        viewType: (img['view_type'] ?? 'FRONT') as String,
+        filePath: filePath,
+        base64Data: bytes != null ? base64Encode(bytes) : null,
+        filename: (img['name'] ?? 'evidence.jpg') as String,
       );
     }
+    SyncManager().queueForSync(insp.localId);
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('⚡ Central server unreachable. Package saved locally for field analysis.'),
+        backgroundColor: Colors.orange,
+      ),
+    );
+
+    // Navigate to real-time Analysis Screen
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AnalysisScreen(
+          inspectionId: insp.localId,
+          inspectionNumber: widget.inspectionNumber,
+        ),
+      ),
+    );
   }
 
   Widget _buildThumbnail(Map<String, dynamic> img) {
