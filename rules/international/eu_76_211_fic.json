@@ -1,0 +1,69 @@
+{
+  "jurisdiction_id": "EU",
+  "country_name": "European Union",
+  "flag_emoji": "🇪🇺",
+  "regulatory_bodies": ["European Commission (DG GROW / DG SANTE)", "WELMEC", "EFSA"],
+  "governing_acts": [
+    "Directive 76/211/EEC (Approximation of the laws of Member States relating to the making-up by weight or volume of certain prepackaged products)",
+    "Regulation (EU) No 1169/2011 (Food Information to Consumers - FIC)",
+    "Directive 98/6/EC (Indication of prices of products offered to consumers)"
+  ],
+  "requirements": [
+    {
+      "dimension": "E_MARK_ESTIMATED",
+      "title": "Estimated Sign (℮-Mark) Compliance",
+      "target_rule": "Directive 76/211/EEC allows prepackages meeting the Three Packers' Rules (average weight >= nominal, limited tolerable negative error TNE) to bear the small '℮' mark.",
+      "indian_rule": "Indian LMPC enforces individual maximum permissible error (MPE) under Schedule II; the '℮' mark is not used under Indian domestic rules.",
+      "comparison_type": "MISSING_IN_TARGET",
+      "action_required_for_export": "Apply for EU statistical batch average verification to affix the CE/℮-mark symbol (min 3mm height) next to nominal quantity."
+    },
+    {
+      "dimension": "PRICING_MRP",
+      "title": "Prohibition of Maximum Retail Price (MRP)",
+      "target_rule": "Resale price maintenance and government-mandated price printing are strictly prohibited under Treaty on the Functioning of the European Union (TFEU) Article 101. Directive 98/6/EC mandates unit pricing (price per kg or litre) at retail.",
+      "indian_rule": "Mandatory printing of Maximum Retail Price (MRP inclusive of all taxes) under LMPC Rule 6(1)(e).",
+      "comparison_type": "PROHIBITED_IN_TARGET",
+      "action_required_for_export": "Remove all 'MRP' declarations. Retailers in EU must display shelf price and unit price (€/kg or €/L)."
+    },
+    {
+      "dimension": "NET_QUANTITY_UNITS",
+      "title": "Nominal Net Quantity Units",
+      "target_rule": "Directive 80/181/EEC mandates metric units: kg or g for weight; l, cl or ml for volume.",
+      "indian_rule": "Indian LMPC Rule 13 mandates metric units (g, kg, ml, l).",
+      "comparison_type": "COMPATIBLE",
+      "action_required_for_export": "Ensure font height meets EU minimums (2mm for <=50g, 3mm for 50g-200g, 4mm for 200g-1kg, 6mm for >1kg)."
+    },
+    {
+      "dimension": "FBO_RESPONSIBLE_PARTY",
+      "title": "EU-Established Food Business Operator (FBO)",
+      "target_rule": "Article 8(1) of Regulation (EU) 1169/2011 mandates the name or business name and address of the food business operator established within the European Union.",
+      "indian_rule": "Rule 6(1)(a) requires manufacturer/packer in India or Indian importer.",
+      "comparison_type": "DIFFERENT_SPECIFICATION",
+      "action_required_for_export": "Add name and postal address of the authorized EU importer or EU-established business entity."
+    },
+    {
+      "dimension": "NUTRITION_DECLARATION",
+      "title": "Mandatory Nutritional Declaration per 100g/100ml",
+      "target_rule": "Article 30 of Regulation (EU) 1169/2011 requires tabular nutritional declaration: Energy (kJ and kcal), fat, of which saturates, carbohydrate, of which sugars, protein, and salt (expressed as 'salt', NOT sodium).",
+      "indian_rule": "Under Indian FSSAI, sodium is declared instead of salt, and energy is often in kcal only.",
+      "comparison_type": "DIFFERENT_SPECIFICATION",
+      "action_required_for_export": "Convert sodium to salt (Salt = Sodium x 2.5) and include energy in both kJ and kcal per 100g/100ml."
+    },
+    {
+      "dimension": "ALLERGENS",
+      "title": "14 Mandatory EU Allergens Highlighted in Ingredients",
+      "target_rule": "Annex II of Regulation 1169/2011 mandates 14 substances (Cereals containing gluten, Crustaceans, Eggs, Fish, Peanuts, Soybeans, Milk, Nuts, Celery, Mustard, Sesame, Sulphites >10mg/kg, Lupin, Molluscs) highlighted with distinct typography (e.g. bold font) in ingredients list.",
+      "indian_rule": "Allergen statement permitted as separate 'Contains...' clause.",
+      "comparison_type": "DIFFERENT_SPECIFICATION",
+      "action_required_for_export": "Emphasize specific allergen ingredients in bold lettering directly within the ingredient listing."
+    },
+    {
+      "dimension": "LANGUAGE",
+      "title": "Destination Member State Official Language",
+      "target_rule": "Article 15 of Regulation 1169/2011 requires mandatory particulars in a language easily understood by the consumers of the Member States where food is marketed (e.g. French in France, German in Germany).",
+      "indian_rule": "English and/or Hindi.",
+      "comparison_type": "DIFFERENT_SPECIFICATION",
+      "action_required_for_export": "Provide multi-lingual label or localized sticker in official language of destination EU country."
+    }
+  ]
+}

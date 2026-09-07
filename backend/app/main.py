@@ -14,7 +14,7 @@ from backend.app.core.exceptions import (
     create_error_response
 )
 from backend.app.api import (
-    health, auth, inspections, images, analysis, declarations, findings, rules, reports, dashboard, audit, sync, area_inspections
+    health, auth, inspections, images, analysis, declarations, findings, rules, reports, dashboard, audit, sync, area_inspections, international
 )
 
 
@@ -92,3 +92,4 @@ app.include_router(dashboard.router, prefix=settings.API_PREFIX)
 app.include_router(audit.router, prefix=settings.API_PREFIX)
 app.include_router(sync.router, prefix=settings.API_PREFIX)
 app.include_router(area_inspections.router, prefix=settings.API_PREFIX)
+app.include_router(international.router, prefix=settings.API_PREFIX)

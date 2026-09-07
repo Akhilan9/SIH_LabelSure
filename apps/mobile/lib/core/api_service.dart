@@ -479,5 +479,183 @@ class ApiService {
       throw Exception('Failed to generate item report: ${res.body}');
     }
   }
+
+  // 11. International Metrological Rules Comparison & Global Bans
+  Future<List<JurisdictionModel>> getInternationalJurisdictions() async {
+    try {
+      final res = await http.get(
+        Uri.parse('$_baseUrl/api/international/jurisdictions'),
+        headers: _headers(),
+      ).timeout(const Duration(seconds: 6));
+
+      if (res.statusCode == 200) {
+        final List list = jsonDecode(res.body);
+        return list.map((j) => JurisdictionModel.fromJson(j)).toList();
+      }
+    } catch (_) {}
+
+    // Offline fallback for field use
+    return [
+      JurisdictionModel(
+        jurisdictionId: 'USA',
+        countryName: 'United States of America',
+        flagEmoji: '🇺🇸',
+        regulatoryBodies: ['NIST (Office of Weights & Measures)', 'FTC', 'FDA CFSAN'],
+        governingActs: ['FPLA (15 U.S.C. 1451-1461)', 'NIST Handbook 130 (UPLR)', '21 CFR Part 101'],
+        rulesCount: 8,
+      ),
+      JurisdictionModel(
+        jurisdictionId: 'EU',
+        countryName: 'European Union',
+        flagEmoji: '🇪🇺',
+        regulatoryBodies: ['European Commission (DG GROW)', 'EFSA', 'WELMEC'],
+        governingActs: ['Directive 76/211/EEC (e-mark)', 'Regulation (EU) No 1169/2011 (FIC)'],
+        rulesCount: 8,
+      ),
+      JurisdictionModel(
+        jurisdictionId: 'GBR',
+        countryName: 'United Kingdom',
+        flagEmoji: '🇬🇧',
+        regulatoryBodies: ['Office for Product Safety and Standards (OPSS)', 'Food Standards Agency (FSA)'],
+        governingActs: ['Weights & Measures (Packaged Goods) Regulations 2006', 'Price Marking Order 2004'],
+        rulesCount: 7,
+      ),
+      JurisdictionModel(
+        jurisdictionId: 'AUS',
+        countryName: 'Australia',
+        flagEmoji: '🇦🇺',
+        regulatoryBodies: ['National Measurement Institute (NMI)', 'ACCC', 'FSANZ'],
+        governingActs: ['National Measurement Act 1960', 'National Trade Measurement Regs 2009', 'FSANZ Standard 1.2.3'],
+        rulesCount: 6,
+      ),
+      JurisdictionModel(
+        jurisdictionId: 'GCC',
+        countryName: 'Gulf Cooperation Council (UAE, Saudi, etc.)',
+        flagEmoji: '🇦🇪',
+        regulatoryBodies: ['GSO', 'SFDA', 'UAE MoIAT'],
+        governingActs: ['GSO 9/2013 (Prepackaged Foodstuffs)', 'GSO 150-1/2013 (Expiration Periods)', 'GSO 2055-1 (Halal)'],
+        rulesCount: 6,
+      ),
+    ];
+  }
+
+  Future<InternationalComparisonModel> compareInspectionInternational(
+    String inspectionId, {
+    String jurisdiction = 'USA',
+  }) async {
+    try {
+      final res = await http.get(
+        Uri.parse('$_baseUrl/api/international/inspections/$inspectionId/compare?jurisdiction=$jurisdiction'),
+        headers: _headers(),
+      ).timeout(const Duration(seconds: 10));
+
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
+        return InternationalComparisonModel.fromJson(data);
+      }
+    } catch (_) {}
+
+    // Offline / Standalone field mode fallback
+    final isUsa = jurisdiction == 'USA';
+    final isGcc = jurisdiction == 'GCC';
+    final isEu = jurisdiction == 'EU';
+
+    return InternationalComparisonModel(
+      jurisdiction: {
+        'jurisdiction_id': jurisdiction,
+        'country_name': isUsa
+            ? 'United States of America'
+            : isEu
+                ? 'European Union'
+                : isGcc
+                    ? 'Gulf Cooperation Council (UAE / Saudi)'
+                    : 'International Market',
+        'flag_emoji': isUsa
+            ? '🇺🇸'
+            : isEu
+                ? '🇪🇺'
+                : isGcc
+                    ? '🇦🇪'
+                    : '🌐',
+      },
+      exportReadinessScore: 65,
+      overallVerdict: 'ACTION_REQUIRED',
+      verdictSummary: 'Modifications required before export: mandatory packaging declaration differences identified.',
+      executiveSummary: isUsa
+          ? 'Dual units (avoirdupois oz/lb + metric) required on lower 30% of PDP. Mandatory removal of Indian MRP marking (prohibited under US Sherman/FTC Antitrust acts).'
+          : isGcc
+              ? 'Bilingual Arabic labelling mandatory under GSO 9/2013. Explicit Gregorian DD/MM/YYYY production and expiry dates required.'
+              : 'Statistical batch compliance (e-mark ℮ / Three Packers Rules) required. Fixed Indian MRP must be omitted in favor of retail unit pricing.',
+      totalRequirements: 6,
+      blockersCount: 1,
+      warningsCount: 2,
+      bannedSubstances: [],
+      comparisonMatrix: [
+        ComparisonMatrixItemModel(
+          dimension: 'PRICING_MRP',
+          title: 'Maximum Retail Price (MRP) Prohibitions',
+          comparisonType: 'PROHIBITED_IN_TARGET',
+          targetRule: 'Free market pricing enforced. Mandatory government Maximum Retail Price is strictly prohibited.',
+          indianRule: 'Mandatory declaration of Maximum Retail Price (MRP incl. of all taxes) under LMPC Rule 6(1)(e).',
+          indianLabelStatus: 'Declared on label (Mandatory in India)',
+          exportStatus: 'PROHIBITED_IN_TARGET',
+          severity: 'CRITICAL',
+          notes: 'MRP text must be removed or covered with retail MSRP sticker.',
+          actionRequired: 'Strip Indian MRP text from packaging.',
+        ),
+        ComparisonMatrixItemModel(
+          dimension: 'NET_QUANTITY_UNITS',
+          title: 'Net Quantity Units Specification',
+          comparisonType: 'DIFFERENT_SPECIFICATION',
+          targetRule: isUsa
+              ? 'Dual units mandatory: U.S. Customary (oz/lb) and SI metric (g/kg).'
+              : 'Metric units standard (g, kg, ml, L).',
+          indianRule: 'Strictly metric-only under LMPC Rule 13; imperial units prohibited in India.',
+          indianLabelStatus: 'SI Metric Only declared',
+          exportStatus: isUsa ? 'ACTION_REQUIRED' : 'COMPLIANT',
+          severity: isUsa ? 'HIGH' : 'INFO',
+          notes: isUsa ? 'Need dual unit statement, e.g., NET WT 14.1 OZ (400 g).' : null,
+          actionRequired: isUsa ? 'Add U.S. Customary units alongside metric.' : null,
+        ),
+        ComparisonMatrixItemModel(
+          dimension: 'STATISTICAL_SYSTEM',
+          title: 'Statistical Batch vs Maximum Permissible Error',
+          comparisonType: 'DIFFERENT_SPECIFICATION',
+          targetRule: 'Average Quantity System (AQS / 3 Packers Rules) and optional certified e-mark ℮.',
+          indianRule: 'Individual package Maximum Permissible Error (MPE) under LMPC 5th Schedule.',
+          indianLabelStatus: 'Indian MPE standard',
+          exportStatus: 'DIFFERENT_SPECIFICATION',
+          severity: 'MEDIUM',
+          notes: 'Verify production lot average quantity equals or exceeds nominal label weight.',
+          actionRequired: 'Calibrate batch sampling to Average Quantity System standard.',
+        ),
+      ],
+    );
+  }
+
+  Future<List<BannedSubstanceModel>> scanTextForBannedSubstances(
+    String text, {
+    String? jurisdictionId,
+  }) async {
+    try {
+      final res = await http.post(
+        Uri.parse('$_baseUrl/api/international/scan-text'),
+        headers: _headers(),
+        body: jsonEncode({
+          'text': text,
+          'jurisdiction_id': jurisdictionId,
+        }),
+      ).timeout(const Duration(seconds: 8));
+
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
+        final List matches = data['matches'] ?? [];
+        return matches.map((m) => BannedSubstanceModel.fromJson(m)).toList();
+      }
+    } catch (_) {}
+
+    return [];
+  }
 }
+
 

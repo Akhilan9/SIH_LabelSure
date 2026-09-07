@@ -1,0 +1,85 @@
+{
+  "jurisdiction_id": "USA",
+  "country_name": "United States of America",
+  "flag_emoji": "🇺🇸",
+  "regulatory_bodies": ["NIST (Office of Weights and Measures)", "FTC", "FDA (CFSAN)"],
+  "governing_acts": [
+    "Fair Packaging and Labeling Act (FPLA, 15 U.S.C. 1451-1461)",
+    "NIST Handbook 130 (Uniform Packaging and Labeling Regulation - UPLR)",
+    "FDA 21 CFR Part 101 (Food Labeling)"
+  ],
+  "requirements": [
+    {
+      "dimension": "NET_QUANTITY_UNITS",
+      "title": "Dual Unit Net Quantity Declaration",
+      "target_rule": "Both U.S. Customary (avoirdupois lb/oz or fl oz) AND SI Metric (g/kg or ml/L) declarations are mandatory under FPLA Section 4(a)(2).",
+      "indian_rule": "Under Indian LMPC Rule 13, only standard SI metric units (g, kg, ml, l) are allowed; avoirdupois/imperial units are strictly prohibited.",
+      "comparison_type": "DIFFERENT_SPECIFICATION",
+      "action_required_for_export": "Add U.S. Customary units alongside metric units (e.g., 'NET WT 14.1 OZ (400 g)' or '16.9 FL OZ (500 mL)')."
+    },
+    {
+      "dimension": "NET_QUANTITY_PLACEMENT",
+      "title": "Principal Display Panel (PDP) Location",
+      "target_rule": "NIST Handbook 130 Section 8.1 requires net quantity declaration within the bottom 30% of the Principal Display Panel parallel to the base.",
+      "indian_rule": "Indian LMPC Rule 6 permits net quantity anywhere on the Principal Display Panel as long as it satisfies minimum numeral font height.",
+      "comparison_type": "DIFFERENT_SPECIFICATION",
+      "action_required_for_export": "Relocate net quantity declaration to the lower 30% of the front-facing Principal Display Panel."
+    },
+    {
+      "dimension": "PRICING_MRP",
+      "title": "Maximum Retail Price (MRP) Prohibition",
+      "target_rule": "Government-mandated Maximum Retail Price (MRP) is illegal under U.S. antitrust and commercial law (Sherman Act & FTC Act); retailers set prices freely.",
+      "indian_rule": "Mandatory declaration of Maximum Retail Price (MRP inclusive of all taxes) under LMPC Rule 6(1)(e); selling above MRP is a punishable offence.",
+      "comparison_type": "PROHIBITED_IN_TARGET",
+      "action_required_for_export": "Remove all 'MRP (incl. of all taxes)' markings. Optional Manufacturer Suggested Retail Price (MSRP) is permitted if clearly marked as suggested."
+    },
+    {
+      "dimension": "COMMODITY_IDENTITY",
+      "title": "Statement of Identity",
+      "target_rule": "21 CFR 101.3 mandates statement of identity on the PDP bold, parallel to base, and prominent in terms of common or usual product name.",
+      "indian_rule": "Common or generic name required on package under Rule 6(1)(b).",
+      "comparison_type": "COMPATIBLE",
+      "action_required_for_export": "Ensure commodity name appears in prominent typography on front panel."
+    },
+    {
+      "dimension": "MANUFACTURER_PACKER",
+      "title": "Business Name and Address",
+      "target_rule": "21 CFR 101.5 permits qualifying phrases such as 'Manufactured for [Name]' or 'Distributed by [Name]' with city, state, and zip code.",
+      "indian_rule": "Rule 6(1)(a) mandates complete physical manufacturing/packing premises address with street name and PIN code.",
+      "comparison_type": "COMPATIBLE",
+      "action_required_for_export": "Include U.S. distributor or importer name and city/state/zip on packaging."
+    },
+    {
+      "dimension": "COUNTRY_OF_ORIGIN",
+      "title": "Country of Origin Marking",
+      "target_rule": "Tariff Act of 1930 (19 U.S.C. 1304) strictly requires 'Product of India' or 'Made in India' conspicuously marked in English on all foreign articles.",
+      "indian_rule": "Mandatory declaration of Country of Origin on imported products under Rule 6(1)(a) proviso.",
+      "comparison_type": "COMPATIBLE",
+      "action_required_for_export": "Print 'Product of India' or 'Made in India' clearly near the distributor information."
+    },
+    {
+      "dimension": "NUTRITION_FACTS",
+      "title": "Nutrition Facts Panel",
+      "target_rule": "21 CFR 101.9 mandates standardized FDA Nutrition Facts panel with serving size, calories, added sugars, vitamin D, calcium, iron, potassium.",
+      "indian_rule": "Nutrition declaration governed primarily by FSSAI (energy, protein, carbs, total sugar, added sugar, fat, sodium).",
+      "comparison_type": "DIFFERENT_SPECIFICATION",
+      "action_required_for_export": "Reformat nutritional values into FDA tabular 'Nutrition Facts' format with % Daily Values."
+    },
+    {
+      "dimension": "ALLERGENS",
+      "title": "Major Food Allergen Declaration",
+      "target_rule": "FASTER Act & FALCPA mandate declaration of 9 major allergens (Milk, Eggs, Fish, Crustacean Shellfish, Tree Nuts, Peanuts, Wheat, Soybeans, Sesame).",
+      "indian_rule": "Allergen labeling specified under FSSAI Packaging & Labelling Regulations.",
+      "comparison_type": "DIFFERENT_SPECIFICATION",
+      "action_required_for_export": "Explicitly identify sesame and major allergens in 'Contains: ...' statement."
+    },
+    {
+      "dimension": "LANGUAGE",
+      "title": "Language Requirements",
+      "target_rule": "21 CFR 101.15 requires all mandatory label declarations to appear in the English language.",
+      "indian_rule": "Permits English or Hindi in Devanagari script under Rule 9.",
+      "comparison_type": "COMPATIBLE",
+      "action_required_for_export": "All declarations must be in English."
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "jurisdiction_id": "GBR",
+  "country_name": "United Kingdom",
+  "flag_emoji": "🇬🇧",
+  "regulatory_bodies": [
+    "Office for Product Safety and Standards (OPSS)",
+    "Food Standards Agency (FSA)",
+    "Trading Standards"
+  ],
+  "governing_acts": [
+    "Weights and Measures (Packaged Goods) Regulations 2006 (SI 2006/659)",
+    "Weights and Measures Act 1985",
+    "Food Information Regulations 2014 (SI 2014/1855)",
+    "Retained Regulation (EU) No 1169/2011 on Food Information to Consumers"
+  ],
+  "requirements": [
+    {
+      "dimension": "STATISTICAL_SYSTEM",
+      "title": "Three Packers' Rules & UK e-mark",
+      "target_rule": "UK SI 2006/659 enforces the Three Packers' Rules: (1) actual average quantity in a batch must not be less than nominal quantity; (2) defective packages exceeding tolerable negative error (TNE) must not exceed 2.5%; (3) zero packages exceeding double TNE. Packers may apply the UK e-mark ℮.",
+      "indian_rule": "Under Indian LMPC 2011 Fifth Schedule, Maximum Permissible Error (MPE) applies to individual packages sampled at retail or manufacturing points.",
+      "comparison_type": "DIFFERENT_SPECIFICATION",
+      "action_required_for_export": "Establish certified batch tare weighing and statistical quantity compliance records conforming to the Three Packers' Rules. Add the UK ℮ mark if certified."
+    },
+    {
+      "dimension": "PRICING_MRP",
+      "title": "Unit Pricing vs Maximum Retail Price (MRP)",
+      "target_rule": "Price Marking Order 2004 requires retailers to display the selling price and unit price (per 100g/kg or 100ml/L). Pre-printed fixed MRP is prohibited by UK competition laws (Competition Act 1998).",
+      "indian_rule": "Mandatory printed Maximum Retail Price (MRP) inclusive of all taxes under LMPC Rule 6(1)(e).",
+      "comparison_type": "PROHIBITED_IN_TARGET",
+      "action_required_for_export": "Omit Indian MRP from label. Importers/retailers in the UK calculate and display shelf unit prices."
+    },
+    {
+      "dimension": "NET_QUANTITY_UNITS",
+      "title": "Metric Units with Optional Supplementary Imperial Units",
+      "target_rule": "Primary indication must be in metric (g, kg, ml, cl, l). Supplementary imperial units (oz, fl oz, lb) are legally permitted but must be secondary and less prominent.",
+      "indian_rule": "Strictly metric-only under LMPC Rule 13; imperial units are illegal.",
+      "comparison_type": "COMPATIBLE",
+      "action_required_for_export": "Use metric units (g, kg, ml, L). Optional UK imperial equivalents may be placed beside metric."
+    },
+    {
+      "dimension": "MANUFACTURER_PACKER",
+      "title": "UK Responsible Food Business Operator (FBO)",
+      "target_rule": "Post-Brexit rules mandate the name and UK postal address of the UK-based importer or Food Business Operator (FBO) on the label.",
+      "indian_rule": "Rule 6(1)(a) requires name and full Indian manufacturing/packaging premises address.",
+      "comparison_type": "ADDITIONAL_MANDATORY_REQUIREMENT",
+      "action_required_for_export": "Add name and registered UK address of the British importer or designated UK FBO."
+    },
+    {
+      "dimension": "ALLERGEN_DECLARATION",
+      "title": "UK 14 Allergens & Natasha's Law",
+      "target_rule": "Under the Food Information (Amendment) (England) Regulations 2020 ('Natasha's Law') and retained FIC, 14 major allergens must be emphasized (e.g., bold or uppercase) within the ingredients list. Celery, lupin, mustard, and sesame are included.",
+      "indian_rule": "FSSAI (Labelling & Display) Regulations 2020 require allergen declaration, but list and typeface contrast requirements differ.",
+      "comparison_type": "DIFFERENT_SPECIFICATION",
+      "action_required_for_export": "Format all 14 recognized UK allergens in bold typography in the ingredients list (e.g., 'Contains: Wheat (Gluten), Soya')."
+    },
+    {
+      "dimension": "NUTRITION_LABELLING",
+      "title": "Back-of-Pack Mandatory Nutrition & Front-of-Pack Traffic Lights",
+      "target_rule": "Mandatory back-of-pack 'per 100g / 100ml' declaration for Energy (kJ and kcal), Fat, Saturates, Carbohydrate, Sugars, Protein, and Salt (sodium chloride equivalent, not elemental sodium). Voluntary UK Traffic Light colour coding recommended.",
+      "indian_rule": "India mandates Energy (kcal), Protein, Carbohydrate (total sugars, added sugars), Total Fat, Saturated Fat, Trans Fat, and Sodium (mg). Salt conversion is not standard.",
+      "comparison_type": "DIFFERENT_SPECIFICATION",
+      "action_required_for_export": "Recalculate nutritional table per 100g/ml; convert Sodium (mg) to Salt (g) [Salt = Sodium × 2.5 / 1000]; declare energy in both kJ and kcal."
+    },
+    {
+      "dimension": "LANGUAGE_REQUIREMENTS",
+      "title": "Official Language",
+      "target_rule": "Mandatory particulars must appear in English; Welsh is permitted optionally alongside English in Wales.",
+      "indian_rule": "English or Hindi required under LMPC Rule 9.",
+      "comparison_type": "COMPATIBLE",
+      "action_required_for_export": "Ensure all label declarations are in clear English."
+    }
+  ]
+}
