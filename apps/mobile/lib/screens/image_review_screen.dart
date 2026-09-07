@@ -101,13 +101,21 @@ class _ImageReviewScreenState extends State<ImageReviewScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('📦 Package images saved locally. Case queued for sync (State: QUEUED).'),
+          content: Text('📦 Package images saved locally. Running on-device compliance analysis...'),
           backgroundColor: AppColors.primary,
         ),
       );
 
-      // Return to home where sync banner/status will be shown
-      Navigator.popUntil(context, (route) => route.isFirst);
+      // Navigate to real-time Analysis Screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => AnalysisScreen(
+            inspectionId: insp.localId,
+            inspectionNumber: widget.inspectionNumber,
+          ),
+        ),
+      );
       return;
     }
 
@@ -158,13 +166,20 @@ class _ImageReviewScreenState extends State<ImageReviewScreen> {
         ),
       );
     } catch (e) {
-      setState(() {
-        _isUploading = false;
-      });
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Upload failed: ${e.toString().replaceAll("Exception: ", "")}'),
-          backgroundColor: AppColors.failRed,
+        const SnackBar(
+          content: Text('⚡ Central server unreachable. Switched to offline field evaluation.'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => AnalysisScreen(
+            inspectionId: widget.inspectionId,
+            inspectionNumber: widget.inspectionNumber,
+          ),
         ),
       );
     }

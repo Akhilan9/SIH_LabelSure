@@ -241,6 +241,17 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                     ),
                     Row(
                       children: [
+                        TextButton.icon(
+                          onPressed: () {
+                            SyncManager().clearEmptyDrafts();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Removed empty scan drafts')),
+                            );
+                          },
+                          icon: const Icon(Icons.cleaning_services, size: 14),
+                          label: const Text('Clean Empty', style: TextStyle(fontSize: 11)),
+                        ),
+                        const SizedBox(width: 4),
                         if (SyncManager().queuedInspections.isNotEmpty)
                           ElevatedButton.icon(
                             onPressed: SyncManager().isSyncing
@@ -368,25 +379,29 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                                         icon: const Icon(Icons.cloud_upload, size: 14),
                                         label: const Text('Sync Now', style: TextStyle(fontSize: 11)),
                                       ),
-                                    if (item.serverId != null)
-                                      TextButton.icon(
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) => FindingsScreen(
-                                                inspectionId: item.serverId!,
-                                                inspectionNumber: item.inspectionNumber ?? item.serverId!,
-                                              ),
+                                    TextButton.icon(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => FindingsScreen(
+                                              inspectionId: item.serverId ?? item.localId,
+                                              inspectionNumber: item.inspectionNumber ?? 'LOCAL-${item.localId.substring(0, 6).toUpperCase()}',
                                             ),
-                                          );
-                                        },
-                                        icon: const Icon(Icons.visibility, size: 14),
-                                        label: const Text('View Findings', style: TextStyle(fontSize: 11)),
-                                      ),
+                                          ),
+                                        );
+                                      },
+                                      icon: const Icon(Icons.analytics_outlined, size: 14),
+                                      label: const Text('Findings', style: TextStyle(fontSize: 11)),
+                                    ),
                                     IconButton(
                                       icon: const Icon(Icons.delete_outline, size: 16, color: Colors.grey),
-                                      onPressed: () => SyncManager().deleteInspection(item.localId),
+                                      onPressed: () {
+                                        SyncManager().deleteInspection(item.localId);
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('Removed from queue')),
+                                        );
+                                      },
                                       tooltip: 'Remove from Queue',
                                     ),
                                   ],
