@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import '../models/inspection.dart';
 import 'storage_service.dart';
@@ -103,6 +104,35 @@ class ApiService {
   }
 
   // 4. Image Upload
+  Future<InspectionImageModel> uploadImageBytes({
+    required String inspectionId,
+    required Uint8List bytes,
+    required String fileName,
+    required String viewType,
+  }) async {
+    final uri = Uri.parse('$_baseUrl/api/inspections/$inspectionId/images');
+    final request = http.MultipartRequest('POST', uri);
+
+    if (_token != null) {
+      request.headers['Authorization'] = 'Bearer $_token';
+    }
+    request.fields['view_type'] = viewType;
+    request.files.add(http.MultipartFile.fromBytes(
+      'file',
+      bytes,
+      filename: fileName,
+    ));
+
+    final streamedRes = await request.send();
+    final res = await http.Response.fromStream(streamedRes);
+
+    if (res.statusCode == 201) {
+      return InspectionImageModel.fromJson(jsonDecode(res.body));
+    } else {
+      throw Exception('Image upload failed: ${res.body}');
+    }
+  }
+
   Future<InspectionImageModel> uploadImage(String inspectionId, String filePath, String viewType) async {
     final uri = Uri.parse('$_baseUrl/api/inspections/$inspectionId/images');
     final request = http.MultipartRequest('POST', uri);

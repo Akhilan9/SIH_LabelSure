@@ -20,10 +20,12 @@ import {
   RefreshCw,
   X,
   Save,
-  Sliders
+  Sliders,
+  Video
 } from 'lucide-react';
 import { api } from '../api/client';
 import { RuleLensViewer } from '../components/RuleLensViewer';
+import { WebcamModal } from '../components/WebcamModal';
 import { InspectionImage, Declaration, Finding } from '../types';
 
 interface InspectionDetailViewProps {
@@ -44,6 +46,7 @@ export const InspectionDetailView: React.FC<InspectionDetailViewProps> = ({
   // Upload State
   const [uploadViewType, setUploadViewType] = useState<string>('FRONT');
   const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [showWebcamModal, setShowWebcamModal] = useState<boolean>(false);
 
   // RuleLens Viewer State
   const [ruleLensImage, setRuleLensImage] = useState<InspectionImage | null>(null);
@@ -663,9 +666,18 @@ export const InspectionDetailView: React.FC<InspectionDetailViewProps> = ({
                 <option value="MRP_PANEL">MRP / Net Quantity Close-Up</option>
               </select>
 
-              <label className="btn btn-primary" style={{ cursor: 'pointer', gap: 8 }}>
+              <button
+                onClick={() => setShowWebcamModal(true)}
+                className="btn btn-primary"
+                style={{ cursor: 'pointer', gap: 8, background: '#10b981', borderColor: '#059669' }}
+              >
+                <Video size={16} />
+                Live Webcam Scan
+              </button>
+
+              <label className="btn btn-secondary" style={{ cursor: 'pointer', gap: 8 }}>
                 <Camera size={16} />
-                {isUploading ? 'Uploading & Preprocessing...' : 'Upload Additional Evidence'}
+                {isUploading ? 'Uploading & Preprocessing...' : 'Upload Image File'}
                 <input 
                   type="file" 
                   accept="image/jpeg,image/png,image/webp" 
@@ -1056,6 +1068,17 @@ export const InspectionDetailView: React.FC<InspectionDetailViewProps> = ({
           declarations={declarations}
           onOverrideFinding={handleOverrideFinding}
           onClose={() => setRuleLensImage(null)}
+        />
+      )}
+
+      {/* Live Webcam Scanner Modal */}
+      {showWebcamModal && inspection && (
+        <WebcamModal
+          isOpen={showWebcamModal}
+          inspectionId={inspectionId}
+          inspectionNumber={inspection.inspection_number}
+          onClose={() => setShowWebcamModal(false)}
+          onUploadSuccess={fetchDetails}
         />
       )}
     </div>
