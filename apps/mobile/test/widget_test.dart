@@ -6,6 +6,9 @@ import 'package:labelsure_mobile/screens/inspection_area_screen.dart';
 import 'package:labelsure_mobile/screens/collective_report_screen.dart';
 import 'package:labelsure_mobile/screens/international_comparison_screen.dart';
 
+import 'package:labelsure_mobile/screens/report_screen.dart';
+import 'package:labelsure_mobile/screens/rulelens_screen.dart';
+
 void main() {
   setUp(() {
     StorageService().setAuth(
@@ -120,6 +123,53 @@ void main() {
 
     expect(find.text('International Metrology'), findsOneWidget);
     expect(find.text('Scan Ingredients'), findsOneWidget);
+  });
+
+  testWidgets('Comprehensive Report Screen Renders 9 Statutory Pillars and Actions', (WidgetTester tester) async {
+    await tester.pumpWidget(const MaterialApp(
+      home: ReportScreen(
+        inspectionId: 'test_insp_pillar_9',
+        inspectionNumber: 'INSP-2026-PIL9',
+      ),
+    ));
+    await tester.pumpAndSettle();
+
+    // Verify Certificate Banner
+    expect(find.text('Statutory Inspection Certificate'), findsOneWidget);
+    expect(find.text('STATUTORY COMPLIANCE CERTIFICATE'), findsOneWidget);
+
+    // Verify 9 Pillars Section Headers
+    expect(find.text('PILLAR 1: PRODUCT IDENTIFICATION'), findsOneWidget);
+    expect(find.text('PILLAR 4: COMPLIANCE STATUS SCORECARD'), findsOneWidget);
+    expect(find.text('PILLAR 7: INSPECTOR VERIFICATION & SEAL'), findsOneWidget);
+    expect(find.text('PILLAR 8: CERTIFIED AUDIT TIMESTAMPS'), findsOneWidget);
+
+    // Verify Actions
+    expect(find.text('Download Official Inspection PDF'), findsOneWidget);
+    expect(find.text('Freeze & Finalize'), findsOneWidget);
+  });
+
+  testWidgets('RuleLens Screen Renders 5-Step Why Is It Wrong Hazard Explanation Card', (WidgetTester tester) async {
+    await tester.pumpWidget(const MaterialApp(
+      home: RuleLensScreen(
+        inspectionId: 'test_insp_rulelens_01',
+        inspectionNumber: 'INSP-2026-RL01',
+      ),
+    ));
+    await tester.pumpAndSettle();
+
+    // Verify RuleLens Title & Controls
+    expect(find.text('RuleLens™ Traceability'), findsOneWidget);
+    expect(find.text('Rule 6(1)(e)'), findsAtLeastNWidgets(1));
+
+    // Verify 5-Step Hazard Card Header and Steps
+    expect(find.text('WHY IS IT WRONG? – HAZARD ANALYSIS'), findsOneWidget);
+    expect(find.text('5-Step Engine'), findsOneWidget);
+    expect(find.text('Detected Issue'), findsOneWidget);
+    expect(find.text('Applicable Statutory Rule'), findsOneWidget);
+    expect(find.text('Reason for Non-Compliance'), findsOneWidget);
+    expect(find.text('Potential Consumer & Regulatory Risk'), findsOneWidget);
+    expect(find.text('Evidence from Package'), findsOneWidget);
   });
 }
 

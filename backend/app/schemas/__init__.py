@@ -267,6 +267,13 @@ class EvidenceItem(BaseModel):
     bbox: List[float] = [0.0, 0.0, 0.0, 0.0]
     ocr_text: Optional[str] = None
 
+class HazardExplanation(BaseModel):
+    detected_issue: str
+    applicable_rule: str
+    reason_for_non_compliance: str
+    consumer_regulatory_risk: Dict[str, str]
+    evidence_from_package: str
+
 class RuleLensFindingResponse(BaseModel):
     id: str
     inspection_id: str
@@ -284,6 +291,7 @@ class RuleLensFindingResponse(BaseModel):
     ai_status: str
     final_status: str
     explanation: str
+    hazard_explanation: Optional[HazardExplanation] = None
     uncertainty_reason: Optional[str] = None
     severity: str
     inspector_status: Optional[str] = None
@@ -313,7 +321,37 @@ class InspectionDetailResponse(InspectionSummary):
     declarations: List[DeclarationResponse] = []
     findings: List[FindingResponse] = []
 
-# --- Report Schema ---
+# --- Report & Structured Enforcement Schemas ---
+class FollowUpAction(BaseModel):
+    action_type: str
+    statutory_section: str
+    title: str
+    description: str
+    penalty_estimate: str
+    deadline_days: int
+    priority: str = "MEDIUM"
+
+class ComprehensiveStructuredReportResponse(BaseModel):
+    certificate_number: str
+    inspection_id: str
+    inspection_number: str
+    compliance_verdict: str
+    generated_at: datetime
+    generated_by: str
+    pdf_url: str
+    pdf_sha256: str
+    
+    # 9 Required Statutory Pillars
+    product_details: Dict[str, Any]
+    extracted_declarations: List[DeclarationResponse]
+    applicable_rules: List[Dict[str, Any]]
+    compliance_status: Dict[str, Any]
+    detected_violations: List[RuleLensFindingResponse]
+    visual_evidence: List[ImageResponse]
+    inspector_verification: Dict[str, Any]
+    timestamps: Dict[str, Any]
+    recommended_follow_up_actions: List[FollowUpAction]
+
 class ReportResponse(BaseModel):
     id: str
     inspection_id: str
@@ -327,6 +365,7 @@ class ReportResponse(BaseModel):
     model_versions: Dict[str, Any]
 
     model_config = ConfigDict(from_attributes=True)
+
 
 # --- Audit & Dashboard Schemas ---
 class AuditLogResponse(BaseModel):

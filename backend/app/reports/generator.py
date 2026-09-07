@@ -10,6 +10,10 @@ from reportlab.platypus import (
     SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, KeepTogether, Image as RLImage
 )
 from backend.app.core.config import settings
+from backend.app.rule_engine.hazard_engine import (
+    generate_hazard_violation_explanation,
+    generate_recommended_follow_up_actions
+)
 
 def generate_inspection_pdf(
     inspection_data: Dict[str, Any],
@@ -512,9 +516,91 @@ def generate_inspection_pdf(
         elements.append(Spacer(1, 8))
 
     # ---------------------------------------------------------
-    # 10. Audit Trail, Chain of Custody & Tamper-Evident Verification
+    # 7. Why Is It Wrong? — Hazard & Violation Explanation Engine
     # ---------------------------------------------------------
-    elements.append(Paragraph("7. AUDIT TRAIL, SYSTEM VERSIONS & LEGAL CERTIFICATION", section_title_style))
+    violations = [f for f in findings if f.get("final_status") != "PASS"]
+    if violations:
+        elements.append(Paragraph("7. WHY IS IT WRONG? — HAZARD & VIOLATION ANALYSIS", section_title_style))
+        elements.append(Spacer(1, 3))
+        
+        hazard_rows = [
+            [
+                Paragraph("<b>Detected Issue & Rule</b>", cell_bold_style),
+                Paragraph("<b>Reason for Non-Compliance</b>", cell_bold_style),
+                Paragraph("<b>Consumer & Regulatory Hazard / Risk</b>", cell_bold_style),
+                Paragraph("<b>Package Evidence</b>", cell_bold_style)
+            ]
+        ]
+        
+        for f in violations:
+            h_data = generate_hazard_violation_explanation(
+                clause_reference=f.get("clause_reference", "Rule 6"),
+                requirement_title=f.get("requirement_title", ""),
+                observed_value=f.get("observed_value"),
+                expected_condition=f.get("expected_condition", ""),
+                final_status=f.get("final_status", "FAIL")
+            )
+            c_risk = h_data.get("consumer_regulatory_risk", {})
+            risk_summary = f"<b>Consumer:</b> {c_risk.get('consumer_harm', 'N/A')}<br/><b>Regulatory:</b> {c_risk.get('regulatory_risk', 'N/A')}"
+            
+            hazard_rows.append([
+                Paragraph(f"<b>{h_data.get('detected_issue')}</b><br/><font color='#b91c1c'>{h_data.get('applicable_rule')}</font>", cell_style),
+                Paragraph(h_data.get("reason_for_non_compliance", ""), cell_style),
+                Paragraph(risk_summary, cell_style),
+                Paragraph(h_data.get("evidence_from_package", ""), cell_style)
+            ])
+            
+        hazard_table = Table(hazard_rows, colWidths=[120, 133, 170, 100])
+        hazard_table.setStyle(TableStyle([
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#fca5a5")),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#fee2e2")),
+            ('TOPPADDING', (0, 0), (-1, -1), 3),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ]))
+        elements.append(hazard_table)
+        elements.append(Spacer(1, 8))
+
+    # ---------------------------------------------------------
+    # 8. Statutory Enforcement & Recommended Follow-up Actions
+    # ---------------------------------------------------------
+    verdict_text = inspection_data.get("compliance_verdict", "PENDING")
+    follow_up_actions = generate_recommended_follow_up_actions(verdict_text, violations, product_context)
+    
+    elements.append(Paragraph("8. RECOMMENDED STATUTORY FOLLOW-UP ACTIONS & NOTICES", section_title_style))
+    elements.append(Spacer(1, 3))
+    
+    action_rows = [
+        [
+            Paragraph("<b>Action Type & Statutory Section</b>", cell_bold_style),
+            Paragraph("<b>Action Title & Directive</b>", cell_bold_style),
+            Paragraph("<b>Penalty / Compounding Est.</b>", cell_bold_style),
+            Paragraph("<b>Timeline</b>", cell_bold_style)
+        ]
+    ]
+    for act in follow_up_actions:
+        action_rows.append([
+            Paragraph(f"<b>{act['action_type']}</b><br/>{act['statutory_section']}", cell_style),
+            Paragraph(f"<b>{act['title']}</b><br/>{act['description']}", cell_style),
+            Paragraph(f"<font color='#991b1b'><b>{act['penalty_estimate']}</b></font>", cell_style),
+            Paragraph(f"{act['deadline_days']} Days" if act['deadline_days'] > 0 else "Immediate", cell_style)
+        ])
+        
+    action_table = Table(action_rows, colWidths=[130, 213, 120, 60])
+    action_table.setStyle(TableStyle([
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#cbd5e1")),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#e2e8f0")),
+        ('TOPPADDING', (0, 0), (-1, -1), 3),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+    ]))
+    elements.append(action_table)
+    elements.append(Spacer(1, 8))
+
+    # ---------------------------------------------------------
+    # 9. Audit Trail, Chain of Custody & Tamper-Evident Verification
+    # ---------------------------------------------------------
+    elements.append(Paragraph("9. AUDIT TRAIL, SYSTEM VERSIONS & LEGAL CERTIFICATION", section_title_style))
     elements.append(Spacer(1, 3))
     
     version_info = (

@@ -7,8 +7,9 @@ from backend.app.core.database import get_db
 from backend.app.core.exceptions import AppException
 from backend.app.models import Finding, Inspection, InspectionImage, User, AuditLog
 from backend.app.schemas import (
-    FindingResponse, FindingReviewUpdate, RuleLensFindingResponse, RuleLensInspectionResponse, EvidenceItem
+    FindingResponse, FindingReviewUpdate, RuleLensFindingResponse, RuleLensInspectionResponse, EvidenceItem, HazardExplanation
 )
+from backend.app.rule_engine.hazard_engine import generate_hazard_violation_explanation
 from backend.app.api.deps import get_current_user, require_role
 
 router = APIRouter(tags=["Findings & RuleLens"])
@@ -70,6 +71,16 @@ def build_rulelens_finding(finding: Finding, image_map: Dict[str, InspectionImag
             ocr_text=snippet
         ))
         
+    hazard_dict = generate_hazard_violation_explanation(
+        clause_reference=finding.clause_reference,
+        requirement_title=finding.requirement_title,
+        observed_value=finding.observed_value,
+        expected_condition=finding.expected_condition,
+        final_status=finding.final_status,
+        ocr_snippet=primary_ocr_text
+    )
+    hazard_exp = HazardExplanation(**hazard_dict) if hazard_dict else None
+
     return RuleLensFindingResponse(
         id=finding.id,
         inspection_id=finding.inspection_id,
@@ -87,6 +98,7 @@ def build_rulelens_finding(finding: Finding, image_map: Dict[str, InspectionImag
         ai_status=finding.ai_status,
         final_status=finding.final_status,
         explanation=finding.explanation,
+        hazard_explanation=hazard_exp,
         uncertainty_reason=finding.uncertainty_reason,
         severity=finding.severity,
         inspector_status=finding.inspector_status,
