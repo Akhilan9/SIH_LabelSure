@@ -466,5 +466,18 @@ class ApiService {
       throw Exception('Failed to generate collective report: ${res.body}');
     }
   }
+
+  Future<Map<String, dynamic>> generateAreaItemReport(String sessionId, String itemId) async {
+    final res = await http.post(
+      Uri.parse('$_baseUrl/api/area-inspections/$sessionId/items/$itemId/report'),
+      headers: _headers(),
+    ).timeout(const Duration(seconds: 15));
+
+    if (res.statusCode == 200) {
+      return jsonDecode(res.body);
+    } else {
+      throw Exception('Failed to generate item report: ${res.body}');
+    }
+  }
 }
 

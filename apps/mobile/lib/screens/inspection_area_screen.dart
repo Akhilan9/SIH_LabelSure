@@ -842,9 +842,109 @@ class _InspectionAreaScreenState extends State<InspectionAreaScreen> {
                 ),
               ),
             ],
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () => _viewIndividualReport(item),
+                  icon: const Icon(Icons.picture_as_pdf, size: 14),
+                  label: const Text('Individual Certificate', style: TextStyle(fontSize: 11)),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    visualDensity: VisualDensity.compact,
+                    foregroundColor: const Color(0xFF0F172A),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _viewIndividualReport(AreaItemModel item) async {
+    if (_currentSession == null) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final rep = await ApiService().generateAreaItemReport(_currentSession!.id, item.id);
+      if (!mounted) return;
+      Navigator.pop(context); // close loader
+
+      final cert = rep['certificate_number'] ?? 'LMPC-CERT';
+      final pdf = rep['pdf_url'] ?? '';
+      final baseUrl = StorageService().baseUrl;
+      final fullUrl = pdf.startsWith('http') ? pdf : '$baseUrl$pdf';
+
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Row(
+            children: [
+              const Icon(Icons.verified, color: AppColors.passGreen, size: 22),
+              const SizedBox(width: 8),
+              const Text('Individual Certificate', style: TextStyle(fontSize: 16)),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(item.commodityName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              const SizedBox(height: 4),
+              Text('Brand: ${item.brandName} | MRP: ${item.mrp}', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+              const Divider(height: 20),
+              Text('Certificate: $cert', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, fontFamily: 'monospace')),
+              const SizedBox(height: 6),
+              Text(
+                'Verdict: ${item.complianceStatus}',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: item.complianceStatus == 'COMPLIANT' ? AppColors.passGreen : AppColors.failRed,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(6)),
+                child: Text('PDF: $fullUrl', style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: Color(0xFF334155))),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Close'),
+            ),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Report Ready: $fullUrl'), backgroundColor: AppColors.primary),
+                );
+              },
+              icon: const Icon(Icons.download, size: 16),
+              label: const Text('Download PDF'),
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context); // close loader
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Item report: $e')),
+        );
+      }
+    }
   }
 }

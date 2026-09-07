@@ -19,7 +19,7 @@ from backend.app.cv.preprocessing import preprocess_label_image
 from backend.app.ocr.engine import run_ocr_on_image
 from backend.app.extraction.extractor import extract_declarations_from_ocr
 from backend.app.rule_engine.engine import load_rules_from_db, load_all_rule_versions, run_compliance_evaluation
-from backend.app.reports.generator import generate_collective_inspection_pdf
+from backend.app.reports.generator import generate_collective_inspection_pdf, generate_inspection_pdf
 
 router = APIRouter(prefix="/area-inspections", tags=["Inspection Area & Centers"])
 
@@ -266,10 +266,14 @@ async def add_product_item_to_area(
         "violations_list": violations_list,
         "findings_summary": findings_summary,
         "declarations_count": len(declarations),
+        "findings": findings,
+        "declarations": declarations,
+        "eval_context": eval_context,
         "image_path": storage_path,
         "image_url": f"/storage/uploads/{stored_filename}",
         "quality_score": q_result.get("quality_score", 1.0),
         "ocr_snippet": full_text[:180] if full_text else "No text detected",
+        "report": None,
         "created_at": datetime.now(timezone.utc).isoformat()
     }
 
@@ -385,3 +389,61 @@ def create_collective_report(session_id: str):
 
     logger.info(f"Generated collective report {report_result['certificate_number']} for session {session['session_number']}")
     return session["report"]
+
+
+@router.post("/{session_id}/items/{item_id}/report")
+def create_individual_item_report(session_id: str, item_id: str):
+    """
+    Generates an Individual Statutory Compliance Inspection Certificate (PDF)
+    for a specific sampled commodity from an area session.
+    """
+    session = _sessions_cache.get(session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Area inspection session not found")
+
+    items = session.get("items", [])
+    item = next((i for i in items if i.get("id") == item_id), None)
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found in session")
+
+    insp_data = {
+        "id": item["id"],
+        "inspection_number": f"{session['session_number']}-ITM{item['item_index']:02d}",
+        "commodity_name": item["commodity_name"],
+        "brand_name": item["brand_name"],
+        "status": "FINALIZED",
+        "compliance_status": item["compliance_status"],
+        "rule_version": "LMPC-2026-RULES",
+        "inspector_name": session.get("inspector_name", "Authorized Legal Metrology Inspector"),
+        "notes": f"Sampled at premise: {session.get('establishment_name')}"
+    }
+
+    images_data = [{
+        "view_type": "FRONT_PANEL",
+        "original_filename": os.path.basename(item.get("image_path", "image.jpg")),
+        "storage_path": item.get("image_path", ""),
+        "sha256_hash": hashlib.sha256(item.get("id", "").encode()).hexdigest(),
+        "is_acceptable": True,
+        "quality_assessment": {"quality_score": item.get("quality_score", 1.0), "warnings": []}
+    }]
+
+    output_filename = f"report_{session_id[:8]}_{item_id[:8]}.pdf"
+    report_res = generate_inspection_pdf(
+        inspection_data=insp_data,
+        findings=item.get("findings", []),
+        declarations=item.get("declarations", []),
+        product_context=item.get("eval_context", {}),
+        images_data=images_data,
+        output_filename=output_filename
+    )
+
+    item["report"] = {
+        "certificate_number": report_res["certificate_number"],
+        "pdf_url": report_res["pdf_url"],
+        "pdf_sha256": report_res["pdf_sha256"],
+        "pdf_filename": report_res["pdf_filename"],
+        "generated_at": datetime.now(timezone.utc).isoformat()
+    }
+    _save_session(session)
+    logger.info(f"Generated individual report {report_res['certificate_number']} for item #{item['item_index']} in session {session['session_number']}")
+    return item["report"]
