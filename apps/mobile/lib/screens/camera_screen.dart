@@ -1,7 +1,9 @@
-import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../core/constants.dart';
+import '../core/webcam/webcam_controller.dart';
 import 'image_review_screen.dart';
 
 class CameraScreen extends StatefulWidget {
@@ -20,9 +22,11 @@ class CameraScreen extends StatefulWidget {
 
 class _CameraScreenState extends State<CameraScreen> {
   final ImagePicker _picker = ImagePicker();
-  final List<Map<String, String>> _capturedImages = []; // [{path, view_type}]
+  final WebcamController _webcam = WebcamController();
+  final List<Map<String, dynamic>> _capturedImages = []; // [{bytes: Uint8List, view_type: String, name: String, path?: String}]
   String _activeViewType = 'FRONT';
   bool _isCapturing = false;
+  bool _isFlashing = false;
 
   final List<String> _viewTypes = [
     'FRONT',
@@ -33,38 +37,102 @@ class _CameraScreenState extends State<CameraScreen> {
     'MRP_PANEL'
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _initializeCamera();
+  }
+
+  Future<void> _initializeCamera() async {
+    if (kIsWeb || _webcam.isSupported) {
+      await _webcam.initialize();
+      if (mounted) setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    _webcam.dispose();
+    super.dispose();
+  }
+
   Future<void> _capturePhoto() async {
     setState(() => _isCapturing = true);
+    
+    // Quick shutter flash effect
+    setState(() => _isFlashing = true);
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (mounted) setState(() => _isFlashing = false);
+    });
+
     try {
-      final XFile? photo = await _picker.pickImage(
-        source: ImageSource.camera,
-        maxWidth: 2400,
-        maxHeight: 2400,
-        imageQuality: 92,
-      );
+      if (_webcam.isSupported && _webcam.isInitialized) {
+        // Direct capture from live HTML5 webcam stream
+        final bytes = await _webcam.captureFrame();
+        if (bytes != null && bytes.isNotEmpty) {
+          _recordCapturedPhoto(
+            bytes: bytes,
+            name: '${_activeViewType.toLowerCase()}_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          );
+        } else {
+          throw Exception('Webcam frame capture returned empty buffer.');
+        }
+      } else {
+        // Fallback to ImagePicker (Native Android/iOS or file dialog fallback)
+        final XFile? photo = await _picker.pickImage(
+          source: ImageSource.camera,
+          maxWidth: 2400,
+          maxHeight: 2400,
+          imageQuality: 92,
+        );
 
-      if (photo != null) {
-        setState(() {
-          _capturedImages.add({
-            'path': photo.path,
-            'view_type': _activeViewType,
-          });
-
-          // Auto-advance to next view type for smooth multi-shot workflow
-          int nextIdx = _viewTypes.indexOf(_activeViewType) + 1;
-          if (nextIdx < _viewTypes.length) {
-            _activeViewType = _viewTypes[nextIdx];
-          }
-        });
+        if (photo != null) {
+          final bytes = await photo.readAsBytes();
+          _recordCapturedPhoto(
+            bytes: bytes,
+            name: photo.name,
+            path: photo.path,
+          );
+        }
       }
     } catch (e) {
-      // In simulator/desktop environments where physical camera is unavailable, allow gallery pick or simulate sample
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Camera capture: ${e.toString()}')),
+        SnackBar(
+          content: Text('Camera capture: ${e.toString().replaceAll("Exception: ", "")}'),
+          action: SnackBarAction(
+            label: 'Pick File',
+            textColor: Colors.amber,
+            onPressed: _pickFromGallery,
+          ),
+        ),
       );
     } finally {
       if (mounted) setState(() => _isCapturing = false);
     }
+  }
+
+  void _recordCapturedPhoto({required Uint8List bytes, required String name, String? path}) {
+    setState(() {
+      _capturedImages.add({
+        'bytes': bytes,
+        'view_type': _activeViewType,
+        'name': name,
+        'path': path ?? name,
+      });
+
+      // Auto-advance to next view type for seamless multi-angle statutory scanning
+      int nextIdx = _viewTypes.indexOf(_activeViewType) + 1;
+      if (nextIdx < _viewTypes.length) {
+        _activeViewType = _viewTypes[nextIdx];
+      }
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('📸 Captured $_activeViewType evidence (${_capturedImages.length} ready)'),
+        duration: const Duration(milliseconds: 1400),
+      ),
+    );
   }
 
   Future<void> _pickFromGallery() async {
@@ -78,21 +146,16 @@ class _CameraScreenState extends State<CameraScreen> {
       );
 
       if (photo != null) {
-        setState(() {
-          _capturedImages.add({
-            'path': photo.path,
-            'view_type': _activeViewType,
-          });
-
-          int nextIdx = _viewTypes.indexOf(_activeViewType) + 1;
-          if (nextIdx < _viewTypes.length) {
-            _activeViewType = _viewTypes[nextIdx];
-          }
-        });
+        final bytes = await photo.readAsBytes();
+        _recordCapturedPhoto(
+          bytes: bytes,
+          name: photo.name,
+          path: photo.path,
+        );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gallery pick: ${e.toString()}')),
+        SnackBar(content: Text('File selection: ${e.toString().replaceAll("Exception: ", "")}')),
       );
     } finally {
       if (mounted) setState(() => _isCapturing = false);
@@ -126,7 +189,7 @@ class _CameraScreenState extends State<CameraScreen> {
       body: SafeArea(
         child: Stack(
           children: [
-            // Camera Viewfinder Simulation / Preview Container
+            // Center Viewfinder: Live Webcam Stream with HUD Overlays
             Center(
               child: AspectRatio(
                 aspectRatio: 3 / 4,
@@ -137,30 +200,78 @@ class _CameraScreenState extends State<CameraScreen> {
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: Colors.white24),
                   ),
+                  clipBehavior: Clip.antiAlias,
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      // Alignment Frame Overlay
-                      Container(
-                        margin: const EdgeInsets.all(28),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: AppColors.primary, width: 2),
-                          borderRadius: BorderRadius.circular(12),
+                      // Layer 1: Live Video Feed
+                      if (_webcam.isSupported)
+                        Positioned.fill(
+                          child: _webcam.buildPreview(),
+                        )
+                      else
+                        const Center(
+                          child: Icon(Icons.camera_alt, color: Colors.white24, size: 64),
                         ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
+
+                      // Layer 2: Shutter Flash Effect
+                      if (_isFlashing)
+                        Positioned.fill(
+                          child: Container(color: Colors.white.withOpacity(0.85)),
+                        ),
+
+                      // Layer 3: Alignment Guide Reticle
+                      IgnorePointer(
+                        child: Container(
+                          margin: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: AppColors.primary.withOpacity(0.8),
+                              width: 2.5,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Stack(
                             children: [
-                              const Icon(Icons.crop_free, color: Colors.white54, size: 48),
-                              const SizedBox(height: 12),
-                              Text(
-                                'Align $_activeViewType Package Label',
-                                style: const TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.bold),
+                              // Corner Accent Marks
+                              Positioned(
+                                top: 8,
+                                left: 8,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.65),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.crop_free, color: Colors.amber, size: 14),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'TARGET: $_activeViewType',
+                                        style: const TextStyle(color: Colors.amber, fontSize: 10, fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                              const SizedBox(height: 4),
-                              const Text(
-                                'Ensure statutory text & MRP are clear and unblurred',
-                                style: TextStyle(color: Colors.white38, fontSize: 10),
+                              Positioned(
+                                bottom: 8,
+                                left: 8,
+                                right: 8,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.65),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: const Text(
+                                    'Ensure MRP, Net Wt & Legal Declarations are in focus',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(color: Colors.white70, fontSize: 10),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -212,14 +323,14 @@ class _CameraScreenState extends State<CameraScreen> {
               ),
             ),
 
-            // Bottom Panel: View Type Selector & Capture Trigger
+            // Bottom Panel: View Type Selector & Capture Controls
             Positioned(
               bottom: 20,
               left: 0,
               right: 0,
               child: Column(
                 children: [
-                  // View Type Chips
+                  // View Type Selector Chips
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -244,17 +355,17 @@ class _CameraScreenState extends State<CameraScreen> {
                       }).toList(),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
 
-                  // Controls Row (Gallery - Shutter - Help/Switch)
+                  // Controls Row (Gallery/File Picker - Shutter - Restart Webcam)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      // Gallery Picker
+                      // Upload from file
                       IconButton(
                         onPressed: _isCapturing ? null : _pickFromGallery,
                         icon: const Icon(Icons.photo_library, color: Colors.white, size: 28),
-                        tooltip: 'Pick from Gallery / Files',
+                        tooltip: 'Upload from Files / Gallery',
                       ),
 
                       // Center Shutter Button
@@ -276,31 +387,43 @@ class _CameraScreenState extends State<CameraScreen> {
                                 shape: BoxShape.circle,
                                 color: Colors.white,
                               ),
-                              child: const Icon(Icons.camera_alt, color: Color(0xFF0F172A), size: 30),
+                              child: _isCapturing
+                                  ? const Padding(
+                                      padding: EdgeInsets.all(12),
+                                      child: CircularProgressIndicator(strokeWidth: 3, color: Color(0xFF0F172A)),
+                                    )
+                                  : const Icon(Icons.camera_alt, color: Color(0xFF0F172A), size: 30),
                             ),
                           ),
                         ),
                       ),
 
-                      // Viewfinder Helper
+                      // Reload / Switch Camera
                       IconButton(
-                        onPressed: () {
+                        onPressed: () async {
+                          await _initializeCamera();
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Position the label within the frame. Capturing as $_activeViewType panel.'),
+                              content: Text(
+                                _webcam.isInitialized
+                                    ? 'Webcam refreshed successfully.'
+                                    : 'Please ensure camera permissions are allowed in your browser address bar.',
+                              ),
                               duration: const Duration(seconds: 2),
                             ),
                           );
                         },
-                        icon: const Icon(Icons.info_outline, color: Colors.white70, size: 28),
-                        tooltip: 'Camera Help',
+                        icon: const Icon(Icons.refresh, color: Colors.white70, size: 28),
+                        tooltip: 'Refresh Camera Stream',
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'Tap Camera to shoot or Gallery to upload label photos',
-                    style: TextStyle(color: Colors.white54, fontSize: 11),
+                  const SizedBox(height: 10),
+                  Text(
+                    _webcam.isInitialized
+                        ? 'Tap Camera to capture live webcam frame'
+                        : 'Webcam active. Or tap gallery to select sample photos.',
+                    style: const TextStyle(color: Colors.white54, fontSize: 11),
                   ),
                 ],
               ),

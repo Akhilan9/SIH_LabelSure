@@ -8,9 +8,11 @@ import {
   CheckCircle2, 
   XCircle, 
   HelpCircle,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Video
 } from 'lucide-react';
 import { api } from '../api/client';
+import { WebcamModal } from '../components/WebcamModal';
 import { InspectionSummary } from '../types';
 
 interface InspectionsViewProps {
@@ -40,6 +42,28 @@ export const InspectionsView: React.FC<InspectionsViewProps> = ({
   const [ruleVersion, setRuleVersion] = useState<string>('LMPC-2026-RULES');
   const [notes, setNotes] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [quickInspection, setQuickInspection] = useState<InspectionSummary | null>(null);
+
+  const handleQuickWebcamScan = async () => {
+    try {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const created = await api.createInspection({
+        commodity_name: `Quick-Scan Product (${timeStr})`,
+        brand_name: 'Retail Package',
+        rule_version: 'LMPC-2026-RULES',
+        notes: 'Created via Direct Webcam Scanner',
+        context: {
+          commodity_category: 'FOOD',
+          is_food: true,
+          origin_country: 'India'
+        }
+      });
+      setQuickInspection(created);
+    } catch (err: any) {
+      alert(`Could not initialize quick scan: ${err.message}`);
+    }
+  };
 
   const fetchInspections = () => {
     setLoading(true);
@@ -148,8 +172,17 @@ export const InspectionsView: React.FC<InspectionsViewProps> = ({
           </select>
 
           <button 
-            onClick={() => setShowNewModal(true)}
+            onClick={handleQuickWebcamScan}
             className="btn btn-primary"
+            style={{ gap: 6, background: '#10b981', borderColor: '#059669' }}
+          >
+            <Video size={16} />
+            Direct Webcam Scan
+          </button>
+
+          <button 
+            onClick={() => setShowNewModal(true)}
+            className="btn btn-secondary"
             style={{ gap: 6 }}
           >
             <Plus size={16} />
@@ -376,6 +409,24 @@ export const InspectionsView: React.FC<InspectionsViewProps> = ({
             </form>
           </div>
         </div>
+      )}
+
+      {/* Direct Webcam Scanner Modal */}
+      {quickInspection && (
+        <WebcamModal
+          isOpen={!!quickInspection}
+          inspectionId={quickInspection.id}
+          inspectionNumber={quickInspection.inspection_number}
+          onClose={() => {
+            const id = quickInspection.id;
+            setQuickInspection(null);
+            fetchInspections();
+            onSelectInspection(id);
+          }}
+          onUploadSuccess={() => {
+            fetchInspections();
+          }}
+        />
       )}
     </div>
   );

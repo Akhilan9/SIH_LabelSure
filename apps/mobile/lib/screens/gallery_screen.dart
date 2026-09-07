@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../core/constants.dart';
@@ -20,7 +20,7 @@ class GalleryScreen extends StatefulWidget {
 
 class _GalleryScreenState extends State<GalleryScreen> {
   final ImagePicker _picker = ImagePicker();
-  final List<Map<String, String>> _selectedImages = [];
+  final List<Map<String, dynamic>> _selectedImages = []; // [{bytes: Uint8List, view_type: String, name: String, path?: String}]
   bool _isLoading = false;
 
   final List<String> _viewTypes = ['FRONT', 'BACK', 'SIDE', 'TOP', 'BOTTOM', 'MRP_PANEL'];
@@ -35,19 +35,29 @@ class _GalleryScreenState extends State<GalleryScreen> {
       );
 
       if (picked.isNotEmpty) {
+        final List<Map<String, dynamic>> newItems = [];
+        for (var i = 0; i < picked.length; i++) {
+          final file = picked[i];
+          final bytes = await file.readAsBytes();
+          final viewType = (_selectedImages.length + i) < _viewTypes.length 
+              ? _viewTypes[_selectedImages.length + i] 
+              : 'FRONT';
+
+          newItems.add({
+            'bytes': bytes,
+            'path': file.path,
+            'name': file.name,
+            'view_type': viewType,
+          });
+        }
+
         setState(() {
-          for (var i = 0; i < picked.length; i++) {
-            final viewType = i < _viewTypes.length ? _viewTypes[i] : 'FRONT';
-            _selectedImages.add({
-              'path': picked[i].path,
-              'view_type': viewType,
-            });
-          }
+          _selectedImages.addAll(newItems);
         });
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gallery pick error: ${e.toString()}')),
+        SnackBar(content: Text('Gallery pick error: ${e.toString().replaceAll("Exception: ", "")}')),
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -143,6 +153,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
                     itemCount: _selectedImages.length,
                     itemBuilder: (ctx, idx) {
                       final item = _selectedImages[idx];
+                      final bytes = item['bytes'] as Uint8List?;
+
                       return Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -158,12 +170,14 @@ class _GalleryScreenState extends State<GalleryScreen> {
                                 child: Container(
                                   color: const Color(0xFF0F172A),
                                   child: Center(
-                                    child: Image.file(
-                                      File(item['path']!),
-                                      fit: BoxFit.cover,
-                                      width: double.infinity,
-                                      errorBuilder: (_, __, ___) => const Icon(Icons.image, color: Colors.white30, size: 36),
-                                    ),
+                                    child: bytes != null && bytes.isNotEmpty
+                                        ? Image.memory(
+                                            bytes,
+                                            fit: BoxFit.cover,
+                                            width: double.infinity,
+                                            errorBuilder: (_, __, ___) => const Icon(Icons.image, color: Colors.white30, size: 36),
+                                          )
+                                        : const Icon(Icons.image, color: Colors.white30, size: 36),
                                   ),
                                 ),
                               ),
@@ -179,9 +193,11 @@ class _GalleryScreenState extends State<GalleryScreen> {
                                     underline: const SizedBox(),
                                     items: _viewTypes.map((t) => DropdownMenuItem(value: t, child: Text(t, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)))).toList(),
                                     onChanged: (val) {
-                                      setState(() {
-                                        _selectedImages[idx]['view_type'] = val!;
-                                      });
+                                      if (val != null) {
+                                        setState(() {
+                                          _selectedImages[idx]['view_type'] = val;
+                                        });
+                                      }
                                     },
                                   ),
                                   IconButton(

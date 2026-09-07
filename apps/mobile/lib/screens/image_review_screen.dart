@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../core/api_service.dart';
 import '../core/constants.dart';
@@ -8,7 +8,7 @@ import 'analysis_screen.dart';
 class ImageReviewScreen extends StatefulWidget {
   final String inspectionId;
   final String inspectionNumber;
-  final List<Map<String, String>> capturedImages; // [{path, view_type}]
+  final List<Map<String, dynamic>> capturedImages; // [{bytes: Uint8List, view_type: String, name: String, path?: String}]
 
   const ImageReviewScreen({
     Key? key,
@@ -22,7 +22,7 @@ class ImageReviewScreen extends StatefulWidget {
 }
 
 class _ImageReviewScreenState extends State<ImageReviewScreen> {
-  late List<Map<String, String>> _images;
+  late List<Map<String, dynamic>> _images;
   bool _isUploading = false;
   double _uploadProgress = 0.0;
   String _uploadStatusText = '';
@@ -40,10 +40,11 @@ class _ImageReviewScreenState extends State<ImageReviewScreen> {
     if (!SyncManager().isOnline || isOfflineInspection) {
       // Offline-First Sync Workflow
       for (final img in _images) {
+        final filePath = (img['path'] ?? img['name'] ?? 'offline_img.jpg') as String;
         SyncManager().addOfflineImage(
           localId: widget.inspectionId,
-          viewType: img['view_type']!,
-          filePath: img['path']!,
+          viewType: (img['view_type'] ?? 'FRONT') as String,
+          filePath: filePath,
         );
       }
       SyncManager().queueForSync(widget.inspectionId);
@@ -70,16 +71,28 @@ class _ImageReviewScreenState extends State<ImageReviewScreen> {
       final total = _images.length;
       for (var i = 0; i < total; i++) {
         final img = _images[i];
+        final viewType = (img['view_type'] ?? 'FRONT') as String;
+        final fileName = (img['name'] ?? 'evidence_${i + 1}.jpg') as String;
+
         setState(() {
-          _uploadStatusText = 'Uploading ${img['view_type']} evidence (${i + 1}/$total)...';
+          _uploadStatusText = 'Uploading $viewType evidence (${i + 1}/$total)...';
           _uploadProgress = (i + 1) / total;
         });
 
-        await ApiService().uploadImage(
-          widget.inspectionId,
-          img['path']!,
-          img['view_type']!,
-        );
+        if (img['bytes'] != null) {
+          await ApiService().uploadImageBytes(
+            inspectionId: widget.inspectionId,
+            bytes: img['bytes'] as Uint8List,
+            fileName: fileName,
+            viewType: viewType,
+          );
+        } else if (img['path'] != null) {
+          await ApiService().uploadImage(
+            widget.inspectionId,
+            img['path'] as String,
+            viewType,
+          );
+        }
       }
 
       if (!mounted) return;
@@ -105,6 +118,17 @@ class _ImageReviewScreenState extends State<ImageReviewScreen> {
         ),
       );
     }
+  }
+
+  Widget _buildThumbnail(Map<String, dynamic> img) {
+    if (img['bytes'] != null && (img['bytes'] as Uint8List).isNotEmpty) {
+      return Image.memory(
+        img['bytes'] as Uint8List,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.white54),
+      );
+    }
+    return const Icon(Icons.image, color: Colors.white54);
   }
 
   @override
@@ -176,6 +200,9 @@ class _ImageReviewScreenState extends State<ImageReviewScreen> {
               separatorBuilder: (_, __) => const SizedBox(height: 12),
               itemBuilder: (ctx, idx) {
                 final img = _images[idx];
+                final viewType = (img['view_type'] ?? 'FRONT') as String;
+                final fileName = (img['name'] ?? 'shot_${idx + 1}.jpg') as String;
+
                 return Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -192,11 +219,7 @@ class _ImageReviewScreenState extends State<ImageReviewScreen> {
                           width: 70,
                           height: 70,
                           color: const Color(0xFF0F172A),
-                          child: Image.file(
-                            File(img['path']!),
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.white54),
-                          ),
+                          child: _buildThumbnail(img),
                         ),
                       ),
                       const SizedBox(width: 14),
@@ -213,13 +236,13 @@ class _ImageReviewScreenState extends State<ImageReviewScreen> {
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
-                                '${img['view_type']} PANEL',
+                                '$viewType PANEL',
                                 style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF334155)),
                               ),
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              img['path']!.split(Platform.pathSeparator).last,
+                              fileName,
                               style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
