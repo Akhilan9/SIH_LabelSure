@@ -77,81 +77,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _showServerConfigDialog() {
-    final controller = TextEditingController(text: StorageService().baseUrl);
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.dns_outlined, color: AppColors.primary),
-            SizedBox(width: 8),
-            Text('Server Connection IP', style: TextStyle(fontSize: 16)),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Enter your computer\'s Wi-Fi IP address so your phone can reach the backend server over local Wi-Fi:',
-              style: TextStyle(fontSize: 12, color: AppColors.textMuted),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: controller,
-              decoration: InputDecoration(
-                labelText: 'Backend Base URL',
-                hintText: 'http://172.21.179.103:8000',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              ),
-            ),
-            const SizedBox(height: 14),
-            const Text('Quick Select Preset:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 6),
-            Wrap(
-              spacing: 6,
-              runSpacing: 4,
-              children: [
-                ActionChip(
-                  label: const Text('PC Wi-Fi (172.21.179.103)', style: TextStyle(fontSize: 10)),
-                  onPressed: () => controller.text = 'http://172.21.179.103:8000',
-                ),
-                ActionChip(
-                  label: const Text('Emulator (10.0.2.2)', style: TextStyle(fontSize: 10)),
-                  onPressed: () => controller.text = 'http://10.0.2.2:8000',
-                ),
-                ActionChip(
-                  label: const Text('Localhost (127.0.0.1)', style: TextStyle(fontSize: 10)),
-                  onPressed: () => controller.text = 'http://127.0.0.1:8000',
-                ),
-              ],
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final newUrl = controller.text.trim();
-              if (newUrl.isNotEmpty) {
-                StorageService().setBaseUrl(newUrl);
-                setState(() => _errorMessage = null);
-              }
-              Navigator.pop(ctx);
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
-            child: const Text('Save & Apply'),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _fillPreset(String u, String p) {
     setState(() {
       _usernameController.text = u;
@@ -238,45 +163,15 @@ class _LoginScreenState extends State<LoginScreen> {
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(color: AppColors.failBorder),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            child: Row(
                               children: [
-                                Row(
-                                  children: [
-                                    const Icon(Icons.error_outline, color: AppColors.failRed, size: 18),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        _errorMessage!,
-                                        style: const TextStyle(fontSize: 11, color: AppColors.failRed, height: 1.4),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                                Row(
-                                  children: [
-                                    OutlinedButton.icon(
-                                      onPressed: _showServerConfigDialog,
-                                      icon: const Icon(Icons.settings, size: 14),
-                                      label: const Text('Change IP', style: TextStyle(fontSize: 11)),
-                                      style: OutlinedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                        foregroundColor: AppColors.primary,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    ElevatedButton.icon(
-                                      onPressed: _loginOffline,
-                                      icon: const Icon(Icons.offline_pin, size: 14),
-                                      label: const Text('Work Offline', style: TextStyle(fontSize: 11)),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(0xFF10B981),
-                                        foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                      ),
-                                    ),
-                                  ],
+                                const Icon(Icons.error_outline, color: AppColors.failRed, size: 18),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    _errorMessage!,
+                                    style: const TextStyle(fontSize: 11, color: AppColors.failRed, height: 1.4),
+                                  ),
                                 ),
                               ],
                             ),
@@ -374,39 +269,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-
-                // Server Config Banner
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppColors.border),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.dns_outlined, size: 14, color: AppColors.primary),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Server: ${StorageService().baseUrl}',
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textMain),
-                      ),
-                      const SizedBox(width: 8),
-                      InkWell(
-                        onTap: _showServerConfigDialog,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryLight,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: const Text('Configure IP', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primary)),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             ),
           ),

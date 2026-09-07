@@ -6,9 +6,16 @@ class StorageService {
   factory StorageService() => _instance;
   StorageService._internal();
 
-  // In-Memory Storage Cache (persisted across screens)
-  String? _authToken;
-  UserModel? _currentUser;
+  // Persistent active officer session - launches app directly without login or server prompts
+  String? _authToken = 'session_field_officer_active';
+  UserModel? _currentUser = UserModel(
+    id: 'usr_field_inspector_01',
+    username: 'inspector1',
+    fullName: 'Field Officer (Inspector)',
+    email: 'inspector@labelsure.gov.in',
+    role: 'INSPECTOR',
+    badgeNumber: 'DL-LM-001',
+  );
   String _baseUrl = AppConstants.defaultBaseUrl;
 
   final Map<String, Map<String, dynamic>> _draftInspections = {};

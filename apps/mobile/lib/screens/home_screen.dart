@@ -20,7 +20,6 @@ class MobileHomeScreen extends StatefulWidget {
 class _MobileHomeScreenState extends State<MobileHomeScreen> {
   List<InspectionModel> _inspections = [];
   bool _isLoading = true;
-  String? _error;
   int _draftCount = 0;
 
   @override
@@ -43,7 +42,6 @@ class _MobileHomeScreenState extends State<MobileHomeScreen> {
   Future<void> _loadDashboard() async {
     setState(() {
       _isLoading = true;
-      _error = null;
       _draftCount = StorageService().getAllDrafts().length;
     });
 
@@ -67,14 +65,11 @@ class _MobileHomeScreenState extends State<MobileHomeScreen> {
         _inspections = list;
         _isLoading = false;
       });
-    } catch (e) {
+    } catch (_) {
       final cached = StorageService().cachedInspections;
       setState(() {
         _inspections = cached;
         _isLoading = false;
-        if (cached.isEmpty) {
-          _error = 'Backend server unreachable. Running in offline field mode.';
-        }
       });
     }
   }
@@ -568,12 +563,6 @@ class _MobileHomeScreenState extends State<MobileHomeScreen> {
               // List of Recent Inspections
               if (_isLoading)
                 const Center(child: Padding(padding: EdgeInsets.all(32), child: CircularProgressIndicator()))
-              else if (_error != null)
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: AppColors.failBg, borderRadius: BorderRadius.circular(10)),
-                  child: Text('Backend connection error: $_error', style: const TextStyle(color: AppColors.failRed, fontSize: 12)),
-                )
               else if (_inspections.isEmpty)
                 Container(
                   padding: const EdgeInsets.all(32),
