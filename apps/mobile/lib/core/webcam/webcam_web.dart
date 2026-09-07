@@ -75,7 +75,9 @@ class WebcamWebController implements WebcamController {
 
       _mediaStream = stream;
       _videoElement!.srcObject = stream;
-      await _videoElement!.play();
+      try {
+        await _videoElement!.play();
+      } catch (_) {}
 
       // Register view factory with dart:ui_web
       ui_web.platformViewRegistry.registerViewFactory(

@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-09-06 17:39:39 UTC",
+  "timestamp": "2026-09-07 07:03:31 UTC",
   "total_cases": 10,
   "correct_decisions": 10,
   "accuracy_pct": 100.0,
-  "avg_latency_ms": 1737.9,
+  "avg_latency_ms": 1454.8,
   "cases": [
     {
       "case_id": "CASE-001",
@@ -13,7 +13,7 @@
       "passed": true,
       "declarations_extracted": 8,
       "findings_count": 9,
-      "latency_ms": 2921.8,
+      "latency_ms": 2429.0,
       "summary": {
         "pass": 8,
         "fail": 0,
@@ -29,7 +29,7 @@
       "passed": true,
       "declarations_extracted": 5,
       "findings_count": 9,
-      "latency_ms": 1513.9,
+      "latency_ms": 1227.7,
       "summary": {
         "pass": 5,
         "fail": 3,
@@ -45,7 +45,7 @@
       "passed": true,
       "declarations_extracted": 5,
       "findings_count": 9,
-      "latency_ms": 1276.4,
+      "latency_ms": 1090.4,
       "summary": {
         "pass": 5,
         "fail": 2,
@@ -61,7 +61,7 @@
       "passed": true,
       "declarations_extracted": 5,
       "findings_count": 9,
-      "latency_ms": 1597.0,
+      "latency_ms": 1339.1,
       "summary": {
         "pass": 4,
         "fail": 4,
@@ -77,7 +77,7 @@
       "passed": true,
       "declarations_extracted": 0,
       "findings_count": 9,
-      "latency_ms": 531.5,
+      "latency_ms": 451.4,
       "summary": {
         "pass": 0,
         "fail": 0,
@@ -93,7 +93,7 @@
       "passed": true,
       "declarations_extracted": 6,
       "findings_count": 9,
-      "latency_ms": 2063.6,
+      "latency_ms": 1378.0,
       "summary": {
         "pass": 5,
         "fail": 3,
@@ -109,7 +109,7 @@
       "passed": true,
       "declarations_extracted": 8,
       "findings_count": 9,
-      "latency_ms": 1867.5,
+      "latency_ms": 1666.3,
       "summary": {
         "pass": 8,
         "fail": 0,
@@ -125,7 +125,7 @@
       "passed": true,
       "declarations_extracted": 7,
       "findings_count": 9,
-      "latency_ms": 1740.1,
+      "latency_ms": 1656.9,
       "summary": {
         "pass": 6,
         "fail": 0,
@@ -141,7 +141,7 @@
       "passed": true,
       "declarations_extracted": 6,
       "findings_count": 9,
-      "latency_ms": 1436.4,
+      "latency_ms": 1242.6,
       "summary": {
         "pass": 8,
         "fail": 0,
@@ -155,9 +155,9 @@
       "expected": "COMPLIANT",
       "actual": "COMPLIANT",
       "passed": true,
-      "declarations_extracted": 9,
+      "declarations_extracted": 8,
       "findings_count": 9,
-      "latency_ms": 2430.8,
+      "latency_ms": 2066.9,
       "summary": {
         "pass": 8,
         "fail": 0,

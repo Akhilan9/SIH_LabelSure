@@ -1,0 +1,95 @@
+name: Build & Release Android APK
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build Type'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+          - release
+          - debug
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
+
+      - name: Verify Flutter & Java Versions
+        run: |
+          flutter --version
+          java -version
+
+      - name: Install Mobile App Dependencies
+        working-directory: apps/mobile
+        run: flutter pub get
+
+      - name: Build Android APK
+        working-directory: apps/mobile
+        run: |
+          if [ "${{ github.event.inputs.build_type }}" = "debug" ]; then
+            flutter build apk --debug
+            cp build/app/outputs/flutter-apk/app-debug.apk ../../labelsure-inspector.apk
+          else
+            flutter build apk --release
+            cp build/app/outputs/flutter-apk/app-release.apk ../../labelsure-inspector.apk
+          fi
+
+      - name: Upload APK as Workflow Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: labelsure-inspector-apk
+          path: labelsure-inspector.apk
+          retention-days: 30
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || 'latest' }}
+          name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || 'APEX LabelSure Mobile Inspector (Latest)' }}
+          body: |
+            ## APEX LabelSure - Android Inspector Mobile Application
+            
+            ### How to Install on your Mobile Phone:
+            1. Open this page on your Android smartphone browser.
+            2. Download `labelsure-inspector.apk` below.
+            3. When prompted, select **"Install"** (enable *"Allow from this source"* if prompted by Android).
+            4. Launch **APEX LabelSure** on your phone!
+            
+            ### Features Included:
+            - Offline-first SQLite local store
+            - Camera scanning for commodity labels (Front, Back, MRP panel)
+            - Real-time Legal Metrology Rule checks (LMPC 2011 to 2026)
+            - 8-stage case sync to central backend server
+          files: labelsure-inspector.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
