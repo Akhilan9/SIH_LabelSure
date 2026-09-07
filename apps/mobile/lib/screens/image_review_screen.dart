@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../core/api_service.dart';
 import '../core/constants.dart';
+import '../core/storage_service.dart';
 import '../core/sync_manager.dart';
 import 'analysis_screen.dart';
 
@@ -36,18 +38,33 @@ class _ImageReviewScreenState extends State<ImageReviewScreen> {
   Future<void> _uploadAndAnalyze() async {
     if (_images.isEmpty) return;
 
-    final isOfflineInspection = SyncManager().getInspection(widget.inspectionId) != null;
-    if (!SyncManager().isOnline || isOfflineInspection) {
+    final user = StorageService().currentUser;
+    final isOfflineMode = !SyncManager().isOnline ||
+        user?.badgeNumber == 'DL-LM-OFFLINE' ||
+        user?.id == 'usr_offline_demo' ||
+        SyncManager().getInspection(widget.inspectionId) != null ||
+        widget.inspectionId.startsWith('OFFLINE-');
+
+    if (isOfflineMode) {
+      var insp = SyncManager().getInspection(widget.inspectionId) ??
+          SyncManager().createOfflineInspection(
+            commodityName: 'Package Inspection (${widget.inspectionNumber})',
+            notes: 'Captured via Direct Camera Scan',
+          );
+
       // Offline-First Sync Workflow
       for (final img in _images) {
         final filePath = (img['path'] ?? img['name'] ?? 'offline_img.jpg') as String;
+        final bytes = img['bytes'] as Uint8List?;
         SyncManager().addOfflineImage(
-          localId: widget.inspectionId,
+          localId: insp.localId,
           viewType: (img['view_type'] ?? 'FRONT') as String,
           filePath: filePath,
+          base64Data: bytes != null ? base64Encode(bytes) : null,
+          filename: (img['name'] ?? 'evidence.jpg') as String,
         );
       }
-      SyncManager().queueForSync(widget.inspectionId);
+      SyncManager().queueForSync(insp.localId);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

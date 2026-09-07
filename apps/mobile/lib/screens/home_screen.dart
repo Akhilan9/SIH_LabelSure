@@ -47,6 +47,20 @@ class _MobileHomeScreenState extends State<MobileHomeScreen> {
       _draftCount = StorageService().getAllDrafts().length;
     });
 
+    final user = StorageService().currentUser;
+    final isOffline = !SyncManager().isOnline ||
+        user?.badgeNumber == 'DL-LM-OFFLINE' ||
+        user?.id == 'usr_offline_demo';
+
+    if (isOffline) {
+      // In offline mode, immediately populate from local cache
+      setState(() {
+        _inspections = StorageService().cachedInspections;
+        _isLoading = false;
+      });
+      return;
+    }
+
     try {
       final list = await ApiService().listInspections();
       setState(() {
@@ -54,37 +68,71 @@ class _MobileHomeScreenState extends State<MobileHomeScreen> {
         _isLoading = false;
       });
     } catch (e) {
+      final cached = StorageService().cachedInspections;
       setState(() {
-        _error = e.toString().replaceAll('Exception: ', '');
+        _inspections = cached;
         _isLoading = false;
+        if (cached.isEmpty) {
+          _error = 'Backend server unreachable. Running in offline field mode.';
+        }
       });
     }
   }
 
   Future<void> _startInstantCameraScan() async {
+    final user = StorageService().currentUser;
+    final isOffline = !SyncManager().isOnline ||
+        user?.badgeNumber == 'DL-LM-OFFLINE' ||
+        user?.id == 'usr_offline_demo';
+
+    final now = DateTime.now();
+    final timeStr = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+
+    if (isOffline) {
+      // Instant 0ms local offline launch - zero waiting!
+      _launchOfflineCameraScan(timeStr);
+      return;
+    }
+
+    // If online, show dismissible progress dialog with 2.5-second timeout fallback
+    bool dialogShowing = true;
     showDialog(
       context: context,
-      barrierDismissible: false,
-      builder: (_) => const Center(
+      barrierDismissible: true,
+      builder: (ctx) => Center(
         child: Card(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Padding(
-            padding: EdgeInsets.all(24),
+            padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text('Launching Camera Scanner...'),
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                const Text(
+                  'Launching Camera Scanner...',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+                const SizedBox(height: 12),
+                TextButton.icon(
+                  onPressed: () {
+                    dialogShowing = false;
+                    Navigator.pop(ctx);
+                    _launchOfflineCameraScan(timeStr);
+                  },
+                  icon: const Icon(Icons.flash_on, size: 16),
+                  label: const Text('Launch Offline Scanner Immediately'),
+                ),
               ],
             ),
           ),
         ),
       ),
-    );
+    ).then((_) {
+      dialogShowing = false;
+    });
 
     try {
-      final now = DateTime.now();
-      final timeStr = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
       final inspection = await ApiService().createInspection({
         'commodity_name': 'Scanned Label ($timeStr)',
         'rule_version': 'LMPC-2026-RULES',
@@ -94,11 +142,14 @@ class _MobileHomeScreenState extends State<MobileHomeScreen> {
           'is_food': true,
           'origin_country': 'India',
         }
-      });
+      }).timeout(const Duration(milliseconds: 2500));
+
+      if (dialogShowing && mounted) {
+        dialogShowing = false;
+        Navigator.pop(context); // dismiss dialog
+      }
 
       if (!mounted) return;
-      Navigator.pop(context); // dismiss dialog
-
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -109,12 +160,44 @@ class _MobileHomeScreenState extends State<MobileHomeScreen> {
         ),
       ).then((_) => _loadDashboard());
     } catch (e) {
+      // If server unreachable, timed out or socket failure, auto-fallback to offline scanner
+      if (dialogShowing && mounted) {
+        dialogShowing = false;
+        Navigator.pop(context); // dismiss dialog
+      }
+
       if (!mounted) return;
-      Navigator.pop(context); // dismiss dialog
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to initialize scan: ${e.toString()}')),
+        const SnackBar(
+          content: Text('⚡ Server unreachable. Launching camera scanner in Offline Field Mode.'),
+          backgroundColor: Colors.blueGrey,
+          duration: Duration(seconds: 2),
+        ),
       );
+      _launchOfflineCameraScan(timeStr);
     }
+  }
+
+  void _launchOfflineCameraScan(String timeStr) {
+    final offlineInsp = SyncManager().createOfflineInspection(
+      commodityName: 'Scanned Label ($timeStr)',
+      notes: 'Created via Direct AI Camera Scan (Offline Mode)',
+      initialContext: {
+        'commodity_category': 'FOOD',
+        'is_food': true,
+        'origin_country': 'India',
+      },
+    );
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CameraScreen(
+          inspectionId: offlineInsp.localId,
+          inspectionNumber: 'OFFLINE-${offlineInsp.localId.substring(0, 8).toUpperCase()}',
+        ),
+      ),
+    ).then((_) => _loadDashboard());
   }
 
   @override

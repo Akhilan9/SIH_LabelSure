@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import '../core/api_service.dart';
 import '../core/constants.dart';
 import '../core/storage_service.dart';
+import '../core/sync_manager.dart';
 import '../models/inspection.dart';
 import 'home_screen.dart';
-import 'settings_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -62,6 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
       badgeNumber: 'DL-LM-OFFLINE',
     );
     StorageService().setAuth('offline_token_local', offlineUser);
+    SyncManager().setManualOnlineOverride(false);
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(

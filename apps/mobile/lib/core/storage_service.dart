@@ -1,4 +1,3 @@
-import 'dart:convert';
 import '../models/inspection.dart';
 import 'constants.dart';
 
@@ -60,6 +59,8 @@ class StorageService {
     _cachedInspections.clear();
     _cachedInspections.addAll(list);
   }
+
+  List<InspectionModel> get cachedInspections => List.unmodifiable(_cachedInspections);
 
   List<InspectionModel> getCachedInspections() {
     return List.unmodifiable(_cachedInspections);

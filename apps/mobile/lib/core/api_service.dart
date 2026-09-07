@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import '../models/inspection.dart';
@@ -61,7 +60,7 @@ class ApiService {
     final res = await http.get(
       Uri.parse('$_baseUrl/api/inspections'),
       headers: _headers(),
-    );
+    ).timeout(const Duration(seconds: 5));
 
     if (res.statusCode == 200) {
       final list = jsonDecode(res.body) as List;
@@ -77,7 +76,7 @@ class ApiService {
     final res = await http.get(
       Uri.parse('$_baseUrl/api/inspections/$id'),
       headers: _headers(),
-    );
+    ).timeout(const Duration(seconds: 5));
 
     if (res.statusCode == 200) {
       return InspectionModel.fromJson(jsonDecode(res.body));
@@ -91,7 +90,7 @@ class ApiService {
       Uri.parse('$_baseUrl/api/inspections'),
       headers: _headers(),
       body: jsonEncode(payload),
-    );
+    ).timeout(const Duration(seconds: 5));
 
     if (res.statusCode == 201) {
       return InspectionModel.fromJson(jsonDecode(res.body));
@@ -107,7 +106,7 @@ class ApiService {
       Uri.parse('$_baseUrl/api/inspections/$inspectionId/context'),
       headers: _headers(),
       body: jsonEncode(payload),
-    );
+    ).timeout(const Duration(seconds: 5));
 
     if (res.statusCode != 200) {
       throw Exception('Failed to update product context');
@@ -134,7 +133,7 @@ class ApiService {
       filename: fileName,
     ));
 
-    final streamedRes = await request.send();
+    final streamedRes = await request.send().timeout(const Duration(seconds: 25));
     final res = await http.Response.fromStream(streamedRes);
 
     if (res.statusCode == 201) {
@@ -154,7 +153,7 @@ class ApiService {
     request.fields['view_type'] = viewType;
     request.files.add(await http.MultipartFile.fromPath('file', filePath));
 
-    final streamedRes = await request.send();
+    final streamedRes = await request.send().timeout(const Duration(seconds: 25));
     final res = await http.Response.fromStream(streamedRes);
 
     if (res.statusCode == 201) {
@@ -169,7 +168,7 @@ class ApiService {
     final res = await http.post(
       Uri.parse('$_baseUrl/api/inspections/$inspectionId/analyze'),
       headers: _headers(),
-    );
+    ).timeout(const Duration(seconds: 20));
 
     if (res.statusCode == 200) {
       return jsonDecode(res.body);
@@ -183,7 +182,7 @@ class ApiService {
     final res = await http.get(
       Uri.parse('$_baseUrl/api/inspections/$inspectionId/rulelens'),
       headers: _headers(),
-    );
+    ).timeout(const Duration(seconds: 8));
 
     if (res.statusCode == 200) {
       return jsonDecode(res.body);
@@ -201,7 +200,7 @@ class ApiService {
         'inspector_status': inspectorStatus,
         'inspector_comment': comment,
       }),
-    );
+    ).timeout(const Duration(seconds: 8));
 
     if (res.statusCode != 200) {
       throw Exception('Failed to record inspector finding override');
@@ -214,7 +213,7 @@ class ApiService {
       Uri.parse('$_baseUrl/api/declarations/$declarationId'),
       headers: _headers(),
       body: jsonEncode(payload),
-    );
+    ).timeout(const Duration(seconds: 8));
 
     if (res.statusCode != 200) {
       throw Exception('Failed to update declaration');
@@ -226,7 +225,7 @@ class ApiService {
     final res = await http.post(
       Uri.parse('$_baseUrl/api/inspections/$inspectionId/finalize'),
       headers: _headers(),
-    );
+    ).timeout(const Duration(seconds: 8));
 
     if (res.statusCode != 200) {
       throw Exception('Failed to finalize inspection case');
@@ -238,7 +237,7 @@ class ApiService {
     final res = await http.post(
       Uri.parse('$_baseUrl/api/inspections/$inspectionId/report'),
       headers: _headers(),
-    );
+    ).timeout(const Duration(seconds: 15));
 
     if (res.statusCode == 201) {
       return ReportModel.fromJson(jsonDecode(res.body));
@@ -251,7 +250,7 @@ class ApiService {
     final res = await http.get(
       Uri.parse('$_baseUrl/api/inspections/$inspectionId/report'),
       headers: _headers(),
-    );
+    ).timeout(const Duration(seconds: 8));
 
     if (res.statusCode == 200) {
       return ReportModel.fromJson(jsonDecode(res.body));
@@ -285,7 +284,7 @@ class ApiService {
       Uri.parse('$_baseUrl/api/sync/inspections'),
       headers: headers,
       body: jsonEncode(payload),
-    );
+    ).timeout(const Duration(seconds: 25));
 
     if (res.statusCode == 200) {
       return jsonDecode(res.body);
@@ -299,7 +298,7 @@ class ApiService {
     final res = await http.get(
       Uri.parse('$_baseUrl/api/sync/status/$idempotencyKey'),
       headers: _headers(),
-    );
+    ).timeout(const Duration(seconds: 8));
 
     if (res.statusCode == 200) {
       return jsonDecode(res.body);
@@ -316,7 +315,7 @@ class ApiService {
     final res = await http.get(
       Uri.parse(url),
       headers: _headers(),
-    );
+    ).timeout(const Duration(seconds: 8));
 
     if (res.statusCode == 200) {
       final list = jsonDecode(res.body) as List;

@@ -41,6 +41,13 @@ class _CameraScreenState extends State<CameraScreen> {
   void initState() {
     super.initState();
     _initializeCamera();
+    if (!kIsWeb && !_webcam.isSupported) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _capturedImages.isEmpty && !_isCapturing) {
+          _capturePhoto();
+        }
+      });
+    }
   }
 
   Future<void> _initializeCamera() async {
