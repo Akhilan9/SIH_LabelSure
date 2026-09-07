@@ -494,3 +494,220 @@ class AreaSessionModel {
     );
   }
 }
+
+class JurisdictionModel {
+  final String jurisdictionId;
+  final String countryName;
+  final String flagEmoji;
+  final List<String> regulatoryBodies;
+  final List<String> governingActs;
+  final int rulesCount;
+
+  JurisdictionModel({
+    required this.jurisdictionId,
+    required this.countryName,
+    required this.flagEmoji,
+    this.regulatoryBodies = const [],
+    this.governingActs = const [],
+    this.rulesCount = 0,
+  });
+
+  factory JurisdictionModel.fromJson(Map<String, dynamic> json) {
+    return JurisdictionModel(
+      jurisdictionId: json['jurisdiction_id'] ?? '',
+      countryName: json['country_name'] ?? '',
+      flagEmoji: json['flag_emoji'] ?? '🌐',
+      regulatoryBodies: json['regulatory_bodies'] != null
+          ? List<String>.from(json['regulatory_bodies'])
+          : [],
+      governingActs: json['governing_acts'] != null
+          ? List<String>.from(json['governing_acts'])
+          : [],
+      rulesCount: json['rules_count'] ?? 0,
+    );
+  }
+}
+
+class CountryBanModel {
+  final String jurisdictionId;
+  final String countryName;
+  final String? regulatoryAgency;
+  final String banType;
+  final int? banYear;
+  final String? legalCitation;
+  final String? healthConcern;
+  final String? reasonSummary;
+
+  CountryBanModel({
+    required this.jurisdictionId,
+    required this.countryName,
+    this.regulatoryAgency,
+    required this.banType,
+    this.banYear,
+    this.legalCitation,
+    this.healthConcern,
+    this.reasonSummary,
+  });
+
+  factory CountryBanModel.fromJson(Map<String, dynamic> json) {
+    return CountryBanModel(
+      jurisdictionId: json['jurisdiction_id'] ?? '',
+      countryName: json['country_name'] ?? '',
+      regulatoryAgency: json['regulatory_agency'],
+      banType: json['ban_type'] ?? 'TOTAL_BAN',
+      banYear: json['ban_year'],
+      legalCitation: json['legal_citation'],
+      healthConcern: json['health_concern'],
+      reasonSummary: json['reason_summary'],
+    );
+  }
+}
+
+class BannedSubstanceModel {
+  final String substanceId;
+  final String canonicalName;
+  final String matchedTerm;
+  final String? category;
+  final String? description;
+  final bool allowedInIndia;
+  final String? indianStatusNote;
+  final bool isBannedInTarget;
+  final CountryBanModel? targetBanDetail;
+  final List<CountryBanModel> allBans;
+  final int totalCountriesBanned;
+
+  BannedSubstanceModel({
+    required this.substanceId,
+    required this.canonicalName,
+    required this.matchedTerm,
+    this.category,
+    this.description,
+    required this.allowedInIndia,
+    this.indianStatusNote,
+    required this.isBannedInTarget,
+    this.targetBanDetail,
+    this.allBans = const [],
+    this.totalCountriesBanned = 0,
+  });
+
+  factory BannedSubstanceModel.fromJson(Map<String, dynamic> json) {
+    var bansList = <CountryBanModel>[];
+    if (json['all_bans'] != null) {
+      bansList = (json['all_bans'] as List)
+          .map((b) => CountryBanModel.fromJson(b))
+          .toList();
+    }
+    return BannedSubstanceModel(
+      substanceId: json['substance_id'] ?? '',
+      canonicalName: json['canonical_name'] ?? '',
+      matchedTerm: json['matched_term'] ?? '',
+      category: json['category'],
+      description: json['description'],
+      allowedInIndia: json['allowed_in_india'] ?? false,
+      indianStatusNote: json['indian_status_note'],
+      isBannedInTarget: json['is_banned_in_target'] ?? false,
+      targetBanDetail: json['target_ban_detail'] != null
+          ? CountryBanModel.fromJson(json['target_ban_detail'])
+          : null,
+      allBans: bansList,
+      totalCountriesBanned: json['total_countries_banned'] ?? bansList.length,
+    );
+  }
+}
+
+class ComparisonMatrixItemModel {
+  final String dimension;
+  final String title;
+  final String comparisonType;
+  final String targetRule;
+  final String indianRule;
+  final String indianLabelStatus;
+  final String exportStatus;
+  final String severity;
+  final String? notes;
+  final String? actionRequired;
+
+  ComparisonMatrixItemModel({
+    required this.dimension,
+    required this.title,
+    required this.comparisonType,
+    required this.targetRule,
+    required this.indianRule,
+    required this.indianLabelStatus,
+    required this.exportStatus,
+    required this.severity,
+    this.notes,
+    this.actionRequired,
+  });
+
+  factory ComparisonMatrixItemModel.fromJson(Map<String, dynamic> json) {
+    return ComparisonMatrixItemModel(
+      dimension: json['dimension'] ?? '',
+      title: json['title'] ?? '',
+      comparisonType: json['comparison_type'] ?? 'COMPATIBLE',
+      targetRule: json['target_rule'] ?? '',
+      indianRule: json['indian_rule'] ?? '',
+      indianLabelStatus: json['indian_label_status'] ?? '',
+      exportStatus: json['export_status'] ?? 'COMPLIANT',
+      severity: json['severity'] ?? 'INFO',
+      notes: json['notes'],
+      actionRequired: json['action_required'],
+    );
+  }
+}
+
+class InternationalComparisonModel {
+  final Map<String, dynamic> jurisdiction;
+  final int exportReadinessScore;
+  final String overallVerdict;
+  final String verdictSummary;
+  final String executiveSummary;
+  final int totalRequirements;
+  final int blockersCount;
+  final int warningsCount;
+  final List<BannedSubstanceModel> bannedSubstances;
+  final List<ComparisonMatrixItemModel> comparisonMatrix;
+
+  InternationalComparisonModel({
+    required this.jurisdiction,
+    required this.exportReadinessScore,
+    required this.overallVerdict,
+    required this.verdictSummary,
+    required this.executiveSummary,
+    required this.totalRequirements,
+    required this.blockersCount,
+    required this.warningsCount,
+    this.bannedSubstances = const [],
+    this.comparisonMatrix = const [],
+  });
+
+  factory InternationalComparisonModel.fromJson(Map<String, dynamic> json) {
+    var bans = <BannedSubstanceModel>[];
+    if (json['banned_substances_detected'] != null) {
+      bans = (json['banned_substances_detected'] as List)
+          .map((b) => BannedSubstanceModel.fromJson(b))
+          .toList();
+    }
+    var matrix = <ComparisonMatrixItemModel>[];
+    if (json['comparison_matrix'] != null) {
+      matrix = (json['comparison_matrix'] as List)
+          .map((m) => ComparisonMatrixItemModel.fromJson(m))
+          .toList();
+    }
+    return InternationalComparisonModel(
+      jurisdiction: json['jurisdiction'] != null
+          ? Map<String, dynamic>.from(json['jurisdiction'])
+          : {},
+      exportReadinessScore: json['export_readiness_score'] ?? 100,
+      overallVerdict: json['overall_verdict'] ?? 'APPROVED_FOR_EXPORT',
+      verdictSummary: json['verdict_summary'] ?? '',
+      executiveSummary: json['executive_summary'] ?? '',
+      totalRequirements: json['total_requirements'] ?? 0,
+      blockersCount: json['blockers_count'] ?? 0,
+      warningsCount: json['warnings_count'] ?? 0,
+      bannedSubstances: bans,
+      comparisonMatrix: matrix,
+    );
+  }
+}
+

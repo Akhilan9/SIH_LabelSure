@@ -353,3 +353,68 @@ class DashboardSummaryResponse(BaseModel):
     recent_inspections: List[InspectionSummary]
     violation_categories: Dict[str, int]
     rule_version_distribution: Dict[str, int]
+
+# --- International Metrology & Banned Substances Schemas ---
+class JurisdictionSummary(BaseModel):
+    jurisdiction_id: str
+    country_name: str
+    flag_emoji: str
+    regulatory_bodies: List[str] = []
+    governing_acts: List[str] = []
+    rules_count: int = 0
+
+class CountryBanDetail(BaseModel):
+    jurisdiction_id: str
+    country_name: str
+    regulatory_agency: Optional[str] = None
+    ban_type: str
+    ban_year: Optional[int] = None
+    legal_citation: Optional[str] = None
+    health_concern: Optional[str] = None
+    reason_summary: Optional[str] = None
+
+class BannedSubstanceMatch(BaseModel):
+    substance_id: str
+    canonical_name: str
+    matched_term: str
+    category: Optional[str] = None
+    description: Optional[str] = None
+    allowed_in_india: bool = False
+    indian_status_note: Optional[str] = None
+    is_banned_in_target: bool = False
+    target_ban_detail: Optional[CountryBanDetail] = None
+    all_bans: List[CountryBanDetail] = []
+    total_countries_banned: int = 0
+
+class ComparisonMatrixItem(BaseModel):
+    dimension: str
+    title: str
+    comparison_type: str
+    target_rule: str
+    indian_rule: str
+    indian_label_status: str
+    export_status: str
+    severity: str
+    notes: Optional[str] = None
+    action_required: Optional[str] = None
+
+class InternationalComparisonResponse(BaseModel):
+    jurisdiction: Dict[str, Any]
+    export_readiness_score: int
+    overall_verdict: str
+    verdict_summary: str
+    executive_summary: str
+    total_requirements: int
+    blockers_count: int
+    warnings_count: int
+    banned_substances_detected: List[BannedSubstanceMatch] = []
+    comparison_matrix: List[ComparisonMatrixItem] = []
+
+class ScanTextRequest(BaseModel):
+    text: str
+    jurisdiction_id: Optional[str] = None
+
+class ScanTextResponse(BaseModel):
+    matches: List[BannedSubstanceMatch]
+    total_found: int
+

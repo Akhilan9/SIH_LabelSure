@@ -4,6 +4,7 @@ import 'package:labelsure_mobile/core/storage_service.dart';
 import 'package:labelsure_mobile/models/inspection.dart';
 import 'package:labelsure_mobile/screens/inspection_area_screen.dart';
 import 'package:labelsure_mobile/screens/collective_report_screen.dart';
+import 'package:labelsure_mobile/screens/international_comparison_screen.dart';
 
 void main() {
   setUp(() {
@@ -107,4 +108,18 @@ void main() {
     expect(find.text('Download Consolidated PDF Report'), findsOneWidget);
     expect(find.text('Return to Main Dashboard'), findsOneWidget);
   });
+
+  testWidgets('International Comparison Screen Renders Jurisdictions and Scan Option', (WidgetTester tester) async {
+    await tester.pumpWidget(const MaterialApp(
+      home: InternationalComparisonScreen(
+        inspectionId: 'test_insp_001',
+        inspectionNumber: 'INSP-2026-TEST',
+      ),
+    ));
+    await tester.pump();
+
+    expect(find.text('International Metrology'), findsOneWidget);
+    expect(find.text('Scan Ingredients'), findsOneWidget);
+  });
 }
+

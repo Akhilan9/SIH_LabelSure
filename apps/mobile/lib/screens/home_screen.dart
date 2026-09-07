@@ -10,6 +10,7 @@ import 'history_screen.dart';
 import 'settings_screen.dart';
 import 'findings_screen.dart';
 import 'inspection_area_screen.dart';
+import 'international_comparison_screen.dart';
 
 class MobileHomeScreen extends StatefulWidget {
   const MobileHomeScreen({Key? key}) : super(key: key);
@@ -573,7 +574,90 @@ class _MobileHomeScreenState extends State<MobileHomeScreen> {
                   ),
                 ),
               ),
+              const SizedBox(height: 12),
+
+              // International Metrology Rules & Global Bans Comparison
+              InkWell(
+                onTap: () {
+                  final targetId = _inspections.isNotEmpty ? _inspections.first.id : 'export_preview_01';
+                  final targetNum = _inspections.isNotEmpty ? _inspections.first.inspectionNumber : 'EXPORT-PREVIEW';
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => InternationalComparisonScreen(
+                        inspectionId: targetId,
+                        inspectionNumber: targetNum,
+                      ),
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF312E81), Color(0xFF4338CA)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF4338CA).withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.18),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(Icons.public, color: Colors.white, size: 28),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Text(
+                                  'International Rules & Bans',
+                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                                ),
+                                const SizedBox(width: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF59E0B),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: const Text(
+                                    '🇺🇸 🇪🇺 🇬🇧 🇦🇺 🇦🇪',
+                                    style: TextStyle(fontSize: 10),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 3),
+                            const Text(
+                              'Compare LMPC with USA, EU, UK, AUS & GCC. Detect globally banned substances & health hazards.',
+                              style: TextStyle(color: Colors.white70, fontSize: 11),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 16),
+                    ],
+                  ),
+                ),
+              ),
               const SizedBox(height: 16),
+
 
               // Quick Actions Grid
               Row(

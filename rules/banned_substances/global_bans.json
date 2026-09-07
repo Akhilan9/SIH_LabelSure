@@ -1,0 +1,458 @@
+{
+  "version": "2026.1",
+  "last_updated": "2026-09-07",
+  "description": "Global regulatory database of banned, restricted, and high-risk food, cosmetic, and packaging substances across major international jurisdictions.",
+  "substances": [
+    {
+      "substance_id": "BAN_E171_TITANIUM_DIOXIDE",
+      "canonical_name": "Titanium Dioxide",
+      "aliases": ["E171", "INS 171", "CI 77891", "Titanium(IV) oxide", "Pigment White 6"],
+      "category": "FOOD_ADDITIVE",
+      "description": "White pigment and opacifying agent used in candies, confectionery, chewing gum, pastries, sauces, and white powders.",
+      "allowed_in_india": true,
+      "indian_status_note": "Permitted in India under FSSAI Food Safety and Standards (Food Products Standards and Food Additives) Regulations 2011 with GMP limits.",
+      "bans": [
+        {
+          "jurisdiction_id": "EU",
+          "country_name": "European Union (27 countries)",
+          "regulatory_agency": "European Food Safety Authority (EFSA) / European Commission",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 2022,
+          "legal_citation": "Commission Regulation (EU) 2022/63 of 14 January 2022",
+          "health_concern": "Genotoxicity & DNA Damage",
+          "reason_summary": "EFSA concluded Titanium Dioxide particles can accumulate in the body and induce DNA strand breaks and chromosomal damage; safe level of daily intake cannot be established."
+        },
+        {
+          "jurisdiction_id": "GBR",
+          "country_name": "United Kingdom (Northern Ireland) & Great Britain Review",
+          "regulatory_agency": "Food Standards Agency (FSA) / UK OPSS",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 2022,
+          "legal_citation": "Retained EU Regulation 2022/63 (NI) and UK FSA Safety Opinion",
+          "health_concern": "Genotoxicity and bioaccumulation",
+          "reason_summary": "Banned in Northern Ireland under EU Protocol; UK FSA and Scottish Food Standards advisory committees recommend phase-out due to lack of established safe limit for DNA toxicity."
+        },
+        {
+          "jurisdiction_id": "CHE",
+          "country_name": "Switzerland",
+          "regulatory_agency": "Federal Food Safety and Veterinary Office (FSVO)",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 2022,
+          "legal_citation": "Swiss Food Law Amendment March 2022",
+          "health_concern": "Cellular genotoxicity",
+          "reason_summary": "Harmonized with EU ban prohibiting E171 in all foodstuffs."
+        }
+      ]
+    },
+    {
+      "substance_id": "BAN_POTASSIUM_BROMATE",
+      "canonical_name": "Potassium Bromate",
+      "aliases": ["E924", "E924a", "INS 924", "Bromic acid potassium salt"],
+      "category": "FOOD_ADDITIVE",
+      "description": "Flour improver and dough conditioner used to strengthen bread dough and enable higher rising.",
+      "allowed_in_india": false,
+      "indian_status_note": "Banned in India by FSSAI in June 2016 following CSE study showing presence of carcinogens in 84% of Delhi bread samples.",
+      "bans": [
+        {
+          "jurisdiction_id": "EU",
+          "country_name": "European Union",
+          "regulatory_agency": "EFSA / European Commission",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 1990,
+          "legal_citation": "Directive 95/2/EC on Food Additives",
+          "health_concern": "Carcinogenicity (IARC Group 2B)",
+          "reason_summary": "Recognized as a genotoxic renal carcinogen by the International Agency for Research on Cancer (IARC). Toxic to kidneys and thyroid."
+        },
+        {
+          "jurisdiction_id": "GBR",
+          "country_name": "United Kingdom",
+          "regulatory_agency": "Food Standards Agency (FSA)",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 1990,
+          "legal_citation": "Bread and Flour Regulations 1998",
+          "health_concern": "Kidney cancer and thyroid tumors",
+          "reason_summary": "Classified as hazardous to human health with proven carcinogenic potential in laboratory studies."
+        },
+        {
+          "jurisdiction_id": "CAN",
+          "country_name": "Canada",
+          "regulatory_agency": "Health Canada",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 1994,
+          "legal_citation": "Food and Drugs Act (Canada)",
+          "health_concern": "Renal and intestinal carcinogen",
+          "reason_summary": "Removed from approved flour treatment agents list due to demonstrated tumor growth in animals."
+        },
+        {
+          "jurisdiction_id": "BRA",
+          "country_name": "Brazil",
+          "regulatory_agency": "ANVISA",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 2000,
+          "legal_citation": "Federal Law No. 10.273",
+          "health_concern": "Carcinogenicity",
+          "reason_summary": "Complete prohibition in flour production and bakery operations."
+        }
+      ]
+    },
+    {
+      "substance_id": "BAN_BROMINATED_VEGETABLE_OIL",
+      "canonical_name": "Brominated Vegetable Oil (BVO)",
+      "aliases": ["BVO", "E443", "Brominated oil"],
+      "category": "FOOD_ADDITIVE",
+      "description": "Emulsifier and density balancer used in fruit-flavored beverages and citrus sodas to keep flavoring oils suspended.",
+      "allowed_in_india": false,
+      "indian_status_note": "Banned in India by FSSAI under the Food Safety and Standards (Prohibition and Restrictions on Sales) Regulations 2011.",
+      "bans": [
+        {
+          "jurisdiction_id": "EU",
+          "country_name": "European Union",
+          "regulatory_agency": "European Commission / EFSA",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 2008,
+          "legal_citation": "Regulation (EC) No 1333/2008",
+          "health_concern": "Thyroid toxicity and bioaccumulation of bromine",
+          "reason_summary": "Bromine accumulates in adipose tissue; linked to neurological impairment, thyroid organ dysfunction, and cardiac lesions."
+        },
+        {
+          "jurisdiction_id": "USA",
+          "country_name": "United States",
+          "regulatory_agency": "U.S. Food and Drug Administration (FDA)",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 2024,
+          "legal_citation": "FDA Final Rule 89 FR 55040 (Effective August 2, 2024)",
+          "health_concern": "Thyroid endocrine disruption",
+          "reason_summary": "FDA revoked authorization for use of BVO in food based on animal toxicology studies showing bioaccumulation and toxic thyroid effects."
+        },
+        {
+          "jurisdiction_id": "GBR",
+          "country_name": "United Kingdom",
+          "regulatory_agency": "Food Standards Agency (FSA)",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 2008,
+          "legal_citation": "Food Additives Regulations",
+          "health_concern": "Accumulation of organic bromine",
+          "reason_summary": "Prohibited as a food ingredient due to systemic accumulation risks."
+        },
+        {
+          "jurisdiction_id": "JPN",
+          "country_name": "Japan",
+          "regulatory_agency": "Ministry of Health, Labour and Welfare (MHLW)",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 2010,
+          "legal_citation": "Japan Food Sanitation Act",
+          "health_concern": "Organ toxicity",
+          "reason_summary": "Not on the positive list of authorized food additives in Japan."
+        }
+      ]
+    },
+    {
+      "substance_id": "BAN_AZODICARBONAMIDE",
+      "canonical_name": "Azodicarbonamide (ADA)",
+      "aliases": ["E927a", "INS 927a", "Azoformamide", "Dicarbamoyldiimide"],
+      "category": "FOOD_ADDITIVE",
+      "description": "Chemical blowing agent used in yoga mats, shoe soles, and synthetic leather; also used as a dough conditioner and flour bleaching agent in industrial bakeries.",
+      "allowed_in_india": true,
+      "indian_status_note": "Permitted in India in bread manufacturing up to 45 ppm under FSSAI regulations.",
+      "bans": [
+        {
+          "jurisdiction_id": "EU",
+          "country_name": "European Union",
+          "regulatory_agency": "European Commission",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 2005,
+          "legal_citation": "Directive 2004/1/EC & Regulation (EC) No 1333/2008",
+          "health_concern": "Respiratory sensitization and semicarbazide (SEM) carcinogen breakdown",
+          "reason_summary": "Thermal breakdown produces semicarbazide, a known mutagen and animal carcinogen. Linked to asthma and allergic skin reactions in workers."
+        },
+        {
+          "jurisdiction_id": "GBR",
+          "country_name": "United Kingdom",
+          "regulatory_agency": "Food Standards Agency / HSE",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 2005,
+          "legal_citation": "UK Bread and Flour Regulations",
+          "health_concern": "Asthma and carcinogen risk",
+          "reason_summary": "Prohibited as a flour bleaching agent and dough conditioner."
+        },
+        {
+          "jurisdiction_id": "AUS",
+          "country_name": "Australia",
+          "regulatory_agency": "FSANZ",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 2000,
+          "legal_citation": "Australia New Zealand Food Standards Code",
+          "health_concern": "Respiratory allergies and toxic degradation",
+          "reason_summary": "Not permitted for use as a food additive in Australia or New Zealand."
+        },
+        {
+          "jurisdiction_id": "SGP",
+          "country_name": "Singapore",
+          "regulatory_agency": "Singapore Food Agency (SFA)",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 2001,
+          "legal_citation": "Sale of Food Act (Chapter 283)",
+          "health_concern": "Severe penalty (up to 15 years imprisonment & $450,000 fine)",
+          "reason_summary": "Strictly illegal to use ADA in food manufacturing."
+        }
+      ]
+    },
+    {
+      "substance_id": "BAN_SUDAN_DYES",
+      "canonical_name": "Sudan Industrial Dyes (Sudan I, II, III, IV & Para Red)",
+      "aliases": ["Sudan I", "Sudan II", "Sudan III", "Sudan IV", "Para Red", "Solvent Yellow 14", "Solvent Red 24"],
+      "category": "FOOD_ADDITIVE",
+      "description": "Synthetic industrial azo dyes used to color waxes, oils, and shoe polish; illegally added to chili powder, paprika, curry powders, and palm oil to impart intense red-orange hue.",
+      "allowed_in_india": false,
+      "indian_status_note": "Strictly prohibited in all foodstuffs by FSSAI and Indian Spices Board. Spices exported from India are subject to mandatory pre-shipment testing.",
+      "bans": [
+        {
+          "jurisdiction_id": "EU",
+          "country_name": "European Union",
+          "regulatory_agency": "EFSA / RASFF (Rapid Alert System for Food and Feed)",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 2003,
+          "legal_citation": "Commission Decision 2003/460/EC and Regulation (EC) No 178/2002",
+          "health_concern": "Genotoxic Carcinogen (Class 3 IARC)",
+          "reason_summary": "Azo dyes metabolize in the human body into carcinogenic aromatic amines (such as aniline and o-toluidine); zero tolerance in food products."
+        },
+        {
+          "jurisdiction_id": "USA",
+          "country_name": "United States",
+          "regulatory_agency": "US FDA",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 2003,
+          "legal_citation": "21 CFR Part 74 (Unapproved Color Additive)",
+          "health_concern": "DNA damage and bladder cancer risk",
+          "reason_summary": "Illegal in any foodstuff; immediate import refusal and border detention on detection."
+        },
+        {
+          "jurisdiction_id": "GBR",
+          "country_name": "United Kingdom",
+          "regulatory_agency": "Food Standards Agency (FSA)",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 2003,
+          "legal_citation": "Contaminants in Food Regulations",
+          "health_concern": "Genotoxicity",
+          "reason_summary": "Zero tolerance; resulted in the largest food recall in UK history in 2005 (over 600 food products recalled)."
+        }
+      ]
+    },
+    {
+      "substance_id": "BAN_SYNTHETIC_FOOD_COLORS_EU_WARNING",
+      "canonical_name": "Southampton Six Azo Colors (Tartrazine, Allura Red, Sunset Yellow, etc.)",
+      "aliases": ["Tartrazine", "E102", "INS 102", "Yellow 5", "Allura Red", "E129", "INS 129", "Red 40", "Sunset Yellow", "E110", "INS 110", "Yellow 6", "Carmoisine", "E122", "Ponceau 4R", "E124", "Quinoline Yellow", "E104"],
+      "category": "FOOD_ADDITIVE",
+      "description": "Synthetic artificial food dyes used across snacks, carbonated drinks, jams, and confections.",
+      "allowed_in_india": true,
+      "indian_status_note": "Permitted in India up to 100 ppm in designated food categories with mandatory 'Contains Permitted Synthetic Food Colour' label.",
+      "bans": [
+        {
+          "jurisdiction_id": "EU",
+          "country_name": "European Union",
+          "regulatory_agency": "European Parliament / EFSA",
+          "ban_type": "MANDATORY_WARNING_LABEL",
+          "ban_year": 2010,
+          "legal_citation": "Regulation (EC) No 1333/2008, Annex V",
+          "health_concern": "Attention Deficit Hyperactivity Disorder (ADHD) in children",
+          "reason_summary": "Mandatory warning statement required on packaging: '[Name of color]: may have an adverse effect on activity and attention in children.' Led to near-universal phase-out by EU manufacturers."
+        },
+        {
+          "jurisdiction_id": "GBR",
+          "country_name": "United Kingdom",
+          "regulatory_agency": "Food Standards Agency (FSA)",
+          "ban_type": "MANDATORY_WARNING_LABEL",
+          "ban_year": 2010,
+          "legal_citation": "Retained Regulation (EC) 1333/2008",
+          "health_concern": "Hyperactivity in children",
+          "reason_summary": "Mandatory warning label required; FSA actively encourages voluntary removal from food products."
+        },
+        {
+          "jurisdiction_id": "NOR",
+          "country_name": "Norway & Austria",
+          "regulatory_agency": "Norwegian Food Safety Authority",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 1978,
+          "legal_citation": "National Food Color Prohibitions",
+          "health_concern": "Severe allergies and pediatric hyperactivity",
+          "reason_summary": "Historically banned outright; harmonized with EU regulations with severe restriction."
+        }
+      ]
+    },
+    {
+      "substance_id": "BAN_PARABENS_COSMETICS",
+      "canonical_name": "Isobutylparaben and Isopropylparaben",
+      "aliases": ["Isobutylparaben", "Isopropylparaben", "Phenylparaben", "Benzylparaben", "Pentylparaben"],
+      "category": "COSMETIC_INGREDIENT",
+      "description": "Preservatives used in personal care lotions, face washes, cosmetics, and creams to prevent microbial growth.",
+      "allowed_in_india": true,
+      "indian_status_note": "Permitted under IS 4707 (Part 2) cosmetics standards in India.",
+      "bans": [
+        {
+          "jurisdiction_id": "EU",
+          "country_name": "European Union",
+          "regulatory_agency": "Scientific Committee on Consumer Safety (SCCS) / European Commission",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 2014,
+          "legal_citation": "Commission Regulation (EU) No 358/2014 & Regulation (EC) No 1223/2009",
+          "health_concern": "Endocrine Disruption & Hormonal Imbalance",
+          "reason_summary": "Exhibits estrogenic activity, interfering with reproductive hormonal regulation; completely prohibited in cosmetic formulations across the EU."
+        },
+        {
+          "jurisdiction_id": "ASEAN",
+          "country_name": "ASEAN Countries (10 nations)",
+          "regulatory_agency": "ASEAN Cosmetic Committee (ACC)",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 2015,
+          "legal_citation": "ASEAN Cosmetic Directive (ACD)",
+          "health_concern": "Endocrine disruption",
+          "reason_summary": "Prohibited in leave-on and rinse-off cosmetic preparations."
+        }
+      ]
+    },
+    {
+      "substance_id": "BAN_PFAS_PACKAGING",
+      "canonical_name": "Per- and Polyfluoroalkyl Substances (PFAS)",
+      "aliases": ["PFAS", "PFOA", "PFOS", "Forever Chemicals", "Perfluorooctanoic acid", "Fluorinated greaseproofing agents"],
+      "category": "PACKAGING_MATERIAL",
+      "description": "Fluorinated chemicals applied to fast-food wrappers, pizza boxes, microwave popcorn bags, and paperboard takeout containers for oil and water resistance.",
+      "allowed_in_india": true,
+      "indian_status_note": "FSSAI (Packaging) Regulations 2018 do not currently set explicit zero-PFAS thresholds on paperboard.",
+      "bans": [
+        {
+          "jurisdiction_id": "DNK",
+          "country_name": "Denmark",
+          "regulatory_agency": "Danish Veterinary and Food Administration (DVFA)",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 2020,
+          "legal_citation": "Executive Order No. 681 of 25 May 2020",
+          "health_concern": "Kidney and testicular cancer, liver toxicity, immune suppression",
+          "reason_summary": "First country in the world to ban all organic fluorinated compounds in paper and cardboard food contact materials."
+        },
+        {
+          "jurisdiction_id": "USA",
+          "country_name": "United States (Federal & State Laws)",
+          "regulatory_agency": "US FDA / California (AB 1200) / New York",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 2024,
+          "legal_citation": "FDA Market Phaseout (Feb 2024) & California Health and Safety Code Section 109000",
+          "health_concern": "Persistent bioaccumulation, carcinogenicity, hormonal disruption",
+          "reason_summary": "FDA confirmed grease-proofing materials containing PFAS are no longer sold for food contact in the US; California AB 1200 banned PFAS in food packaging from January 2023."
+        },
+        {
+          "jurisdiction_id": "EU",
+          "country_name": "European Union",
+          "regulatory_agency": "European Chemicals Agency (ECHA)",
+          "ban_type": "RESTRICTED_USE",
+          "ban_year": 2023,
+          "legal_citation": "REACH Annex XVII & upcoming universal PFAS restriction",
+          "health_concern": "Persistence in environment and human blood",
+          "reason_summary": "Phase-out of all non-essential uses of PFAS under the EU Green Deal Chemicals Strategy."
+        }
+      ]
+    },
+    {
+      "substance_id": "BAN_RBGH_RBST",
+      "canonical_name": "Recombinant Bovine Somatotropin (rBGH / rBST)",
+      "aliases": ["rBGH", "rBST", "Recombinant bovine growth hormone", "Bovine somatotropin"],
+      "category": "AGRICULTURAL_RESIDUE",
+      "description": "Synthetic growth hormone injected into dairy cows to artificially elevate milk production.",
+      "allowed_in_india": false,
+      "indian_status_note": "Banned in India under Section 26A of the Drugs and Cosmetics Act (import and manufacture prohibited).",
+      "bans": [
+        {
+          "jurisdiction_id": "EU",
+          "country_name": "European Union",
+          "regulatory_agency": "European Commission",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 1999,
+          "legal_citation": "Council Decision 1999/879/EC",
+          "health_concern": "Elevated IGF-1 (linked to prostate and breast cancers), animal welfare (mastitis)",
+          "reason_summary": "Strict prohibition on marketing and administration of bovine somatotrophin in the EU."
+        },
+        {
+          "jurisdiction_id": "CAN",
+          "country_name": "Canada",
+          "regulatory_agency": "Health Canada",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 1999,
+          "legal_citation": "Health Canada Veterinary Drugs Directorate",
+          "health_concern": "Animal health risks and antibiotic residue concerns",
+          "reason_summary": "Denied regulatory approval due to veterinary health concerns and elevated somatic cell counts in dairy."
+        },
+        {
+          "jurisdiction_id": "AUS",
+          "country_name": "Australia & New Zealand",
+          "regulatory_agency": "Australian Pesticides and Veterinary Medicines Authority (APVMA)",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 1999,
+          "legal_citation": "Agricultural and Veterinary Chemicals Code Act 1994",
+          "health_concern": "Veterinary welfare and human health risks",
+          "reason_summary": "Registration not approved for dairy cattle treatment."
+        }
+      ]
+    },
+    {
+      "substance_id": "BAN_OLESTRA",
+      "canonical_name": "Olestra (Olean)",
+      "aliases": ["Olestra", "Olean", "Sucrose polyester"],
+      "category": "FOOD_ADDITIVE",
+      "description": "Synthetic fat substitute used in zero-fat potato chips and savory snacks that cannot be absorbed by the digestive system.",
+      "allowed_in_india": false,
+      "indian_status_note": "Not approved by FSSAI on the positive list of authorized food additives.",
+      "bans": [
+        {
+          "jurisdiction_id": "EU",
+          "country_name": "European Union",
+          "regulatory_agency": "EFSA / European Commission",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 2000,
+          "legal_citation": "Novel Food Regulation (EC) No 258/97",
+          "health_concern": "Depletion of fat-soluble vitamins (A, D, E, K), carotenoid malabsorption, severe gastrointestinal cramps",
+          "reason_summary": "Denied novel food authorization because it binds to fat-soluble nutrients and carries severe digestive distress risks."
+        },
+        {
+          "jurisdiction_id": "CAN",
+          "country_name": "Canada",
+          "regulatory_agency": "Health Canada",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 2000,
+          "legal_citation": "Food and Drug Regulations (Canada)",
+          "health_concern": "Nutrient depletion and gastrointestinal leakage",
+          "reason_summary": "Not approved for use in Canadian foods."
+        },
+        {
+          "jurisdiction_id": "GBR",
+          "country_name": "United Kingdom",
+          "regulatory_agency": "Food Standards Agency",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 2000,
+          "legal_citation": "Food Safety Act 1990",
+          "health_concern": "Nutrient absorption inhibition",
+          "reason_summary": "Not approved on the UK permitted food additives list."
+        }
+      ]
+    },
+    {
+      "substance_id": "BAN_CYCLAMATE",
+      "canonical_name": "Sodium Cyclamate",
+      "aliases": ["Cyclamate", "E952", "INS 952", "Sodium cyclohexylsulfamate"],
+      "category": "FOOD_ADDITIVE",
+      "description": "Artificial non-caloric sweetener 30-50 times sweeter than sucrose, commonly blended with saccharin in diet drinks and confectionery.",
+      "allowed_in_india": false,
+      "indian_status_note": "Not permitted in India by FSSAI under the Food Safety and Standards (Food Products Standards and Food Additives) Regulations 2011.",
+      "bans": [
+        {
+          "jurisdiction_id": "USA",
+          "country_name": "United States",
+          "regulatory_agency": "US FDA",
+          "ban_type": "TOTAL_BAN",
+          "ban_year": 1969,
+          "legal_citation": "21 CFR 189.135",
+          "health_concern": "Bladder cancer and testicular atrophy in animal models",
+          "reason_summary": "FDA banned cyclamate in 1969 after laboratory rat studies demonstrated increased bladder tumors when fed cyclamate-saccharin mixtures."
+        }
+      ]
+    }
+  ]
+}

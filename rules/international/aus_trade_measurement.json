@@ -1,0 +1,66 @@
+{
+  "jurisdiction_id": "AUS",
+  "country_name": "Australia",
+  "flag_emoji": "🇦🇺",
+  "regulatory_bodies": [
+    "National Measurement Institute (NMI)",
+    "Australian Competition and Consumer Commission (ACCC)",
+    "Food Standards Australia New Zealand (FSANZ)"
+  ],
+  "governing_acts": [
+    "National Measurement Act 1960",
+    "National Trade Measurement Regulations 2009 (NTMR)",
+    "Australia New Zealand Food Standards Code",
+    "Country of Origin Food Labelling Information Standard 2016"
+  ],
+  "requirements": [
+    {
+      "dimension": "STATISTICAL_SYSTEM",
+      "title": "Average Quantity System (AQS)",
+      "target_rule": "National Measurement Act 1960 Part V & NTMR Part 4 adopt the international Average Quantity System (AQS). A pack may not have a shortfall exceeding tolerable negative error (TNE) and batch average must equal or exceed marked weight.",
+      "indian_rule": "Under Indian LMPC 2011, Maximum Permissible Error (MPE) applies with specific percentage/gram tolerances.",
+      "comparison_type": "DIFFERENT_SPECIFICATION",
+      "action_required_for_export": "Verify production packaging line is calibrated and audited to meet Australian AQS sampling thresholds."
+    },
+    {
+      "dimension": "COUNTRY_OF_ORIGIN",
+      "title": "Country of Origin Kangaroo & Bar Chart Standard",
+      "target_rule": "Under the Country of Origin Food Labelling Information Standard 2016, imported foods must display a clear text statement in a defined box (e.g., 'Grown in India' or 'Made in India from Indian ingredients'). Australian-made goods require the kangaroo triangular logo and percentage bar chart.",
+      "indian_rule": "Indian LMPC Rule 6(1)(a) requires statement of 'Country of Origin' for imported goods.",
+      "comparison_type": "DIFFERENT_SPECIFICATION",
+      "action_required_for_export": "Place a bordered Country of Origin declaration statement on the package: 'Product of India' or 'Made in India'."
+    },
+    {
+      "dimension": "PRICING_MRP",
+      "title": "Price Marking & Prohibition of Government MRP",
+      "target_rule": "Competition and Consumer Act 2010 (Australian Consumer Law) prohibits mandatory maximum resale price fixing. Retailers independently determine retail pricing and unit pricing.",
+      "indian_rule": "Mandatory Maximum Retail Price (MRP) declaration under Rule 6(1)(e).",
+      "comparison_type": "PROHIBITED_IN_TARGET",
+      "action_required_for_export": "Remove Indian MRP text. Selling price is applied by Australian retail POS/shelf tagging."
+    },
+    {
+      "dimension": "NET_QUANTITY_PLACEMENT",
+      "title": "Principal Display Panel Measurement Height",
+      "target_rule": "NTMR Schedule 4 sets mandatory minimum letter height for net measurement based on package dimension: packages up to 120mm require minimum 2.0mm character height; 120-230mm require 2.5mm; 230-360mm require 3.3mm; over 360mm require 4.8mm.",
+      "indian_rule": "LMPC Rule 7 Table I defines numeral heights based on net quantity volume/weight brackets (e.g., 200g-1kg requires 4.0mm height).",
+      "comparison_type": "DIFFERENT_SPECIFICATION",
+      "action_required_for_export": "Audit front panel dimensions and adjust net weight font size to meet NTMR Schedule 4 minimums."
+    },
+    {
+      "dimension": "ALLERGEN_DECLARATION",
+      "title": "FSANZ Plain English Allergen Labelling (PEAL)",
+      "target_rule": "FSANZ Standard 1.2.3 requires mandatory declaration of allergens (crustacea, egg, fish, milk, peanut, sesame, soybean, tree nuts, wheat, gluten, lupin, sulfites >10mg/kg) using specific required terminology in bold within the ingredients list AND in a separate 'Contains' summary statement.",
+      "indian_rule": "FSSAI requires allergen listing, but the strict two-location Plain English Allergen Labelling (PEAL) format is unique to Australia.",
+      "comparison_type": "ADDITIONAL_MANDATORY_REQUIREMENT",
+      "action_required_for_export": "Add both bold highlighted terms in the ingredient list AND a dedicated bold 'Contains: [Allergens]' summary statement immediately below the ingredients."
+    },
+    {
+      "dimension": "MANUFACTURER_PACKER",
+      "title": "Australian or New Zealand Business Address",
+      "target_rule": "Standard 1.2.2 requires the name and business street address (not PO Box alone) of the Australian or New Zealand importer, manufacturer, or vendor.",
+      "indian_rule": "Rule 6(1)(a) requires the complete manufacturing address in India.",
+      "comparison_type": "ADDITIONAL_MANDATORY_REQUIREMENT",
+      "action_required_for_export": "Print the Australian importer's registered business street address on the label."
+    }
+  ]
+}

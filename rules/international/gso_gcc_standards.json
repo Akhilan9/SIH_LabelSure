@@ -1,0 +1,66 @@
+{
+  "jurisdiction_id": "GCC",
+  "country_name": "Gulf Cooperation Council (UAE, Saudi Arabia, etc.)",
+  "flag_emoji": "🇦🇪",
+  "regulatory_bodies": [
+    "GCC Standardization Organization (GSO)",
+    "Saudi Food & Drug Authority (SFDA)",
+    "UAE Ministry of Industry and Advanced Technology (MoIAT)"
+  ],
+  "governing_acts": [
+    "GSO 9/2013 (Labelling of Prepackaged Foodstuffs)",
+    "GSO 150-1/2013 (Expiration Periods of Food Products)",
+    "GSO 2055-1 (Halal Food Requirements - General Requirements)",
+    "GSO 2233/2012 (Requirements on Nutritional Labelling)"
+  ],
+  "requirements": [
+    {
+      "dimension": "LANGUAGE_REQUIREMENTS",
+      "title": "Mandatory Bilingual Arabic Labelling",
+      "target_rule": "GSO 9/2013 Clause 4.1 mandates that all mandatory labelling particulars (product name, ingredients, nutritional panel, expiry, origin, storage conditions) MUST be in Arabic. English may appear concurrently alongside Arabic.",
+      "indian_rule": "Indian LMPC Rule 9 permits declarations in English or Hindi (in Devanagari script). Arabic is not recognized.",
+      "comparison_type": "ADDITIONAL_MANDATORY_REQUIREMENT",
+      "action_required_for_export": "Provide complete Arabic translation of the label or apply a certified bilingual Arabic/English over-sticker."
+    },
+    {
+      "dimension": "BEST_BEFORE_EXPIRY",
+      "title": "Explicit Production & Expiration Dates (Gregorian)",
+      "target_rule": "GSO 150-1/2013 strictly requires explicit Production Date AND Expiration Date in Day/Month/Year or Month/Year format (Gregorian calendar). Relative claims like 'Best Before 6 months from packaging' without explicit end dates are prohibited on many categories.",
+      "indian_rule": "Indian LMPC permits declaration of 'Month and Year of Manufacture' or 'Best Before X months from manufacture'.",
+      "comparison_type": "DIFFERENT_SPECIFICATION",
+      "action_required_for_export": "Print explicit Production Date (تاريخ الإنتاج) and Expiry Date (تاريخ انتهاء الصلاحية) in DD/MM/YYYY format."
+    },
+    {
+      "dimension": "HALAL_AND_RELIGIOUS",
+      "title": "Halal Compliance & Animal Derivation",
+      "target_rule": "GSO 2055-1 strictly prohibits non-halal meat derivatives, pork/porcine ingredients (lard, porcine gelatin), and ethyl alcohol as an ingredient. Any gelatin or mono- and diglycerides (E471) must specify 100% plant or Halal-certified bovine origin.",
+      "indian_rule": "FSSAI requires Green dot (Veg) or Brown dot (Non-Veg) symbol; specific halal certification is voluntary.",
+      "comparison_type": "ADDITIONAL_MANDATORY_REQUIREMENT",
+      "action_required_for_export": "Ensure product is 100% Halal certified, free of alcohol and pork derivatives, and state vegetable/halal source for all emulsifiers and gelatin."
+    },
+    {
+      "dimension": "PRICING_MRP",
+      "title": "Prohibition of Fixed Indian MRP",
+      "target_rule": "Prices are set freely by GCC retailers or monitored under local Ministry of Economy price-monitoring directives. Indian Rupee (₹) MRP printing is prohibited or invalid.",
+      "indian_rule": "Mandatory Maximum Retail Price (MRP ₹ incl. of all taxes) under LMPC Rule 6(1)(e).",
+      "comparison_type": "PROHIBITED_IN_TARGET",
+      "action_required_for_export": "Remove Indian MRP markings. Pricing in AED/SAR is handled at local retail POS."
+    },
+    {
+      "dimension": "NET_QUANTITY_UNITS",
+      "title": "International System of Units (SI Metric)",
+      "target_rule": "GSO 9 Clause 5.3 mandates the International System of Units (g, kg, ml, L) in Arabic numerals and Arabic script symbols.",
+      "indian_rule": "SI metric units mandated under LMPC Rule 13.",
+      "comparison_type": "COMPATIBLE",
+      "action_required_for_export": "Declare net weight/volume in metric units with Arabic unit symbols (e.g., غ for grams, مل for ml)."
+    },
+    {
+      "dimension": "COUNTRY_OF_ORIGIN",
+      "title": "Country of Origin in Arabic",
+      "target_rule": "GSO 9 Clause 5.8 requires the country of manufacture to be clearly stated in Arabic (e.g., 'صنع في الهند' - Made in India).",
+      "indian_rule": "Country of origin in English or Hindi required.",
+      "comparison_type": "DIFFERENT_SPECIFICATION",
+      "action_required_for_export": "Include 'صنع في الهند' (Made in India) prominently on the packaging."
+    }
+  ]
+}

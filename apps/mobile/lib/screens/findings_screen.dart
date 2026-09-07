@@ -5,6 +5,7 @@ import '../models/inspection.dart';
 import 'inspector_review_screen.dart';
 import 'rulelens_screen.dart';
 import 'report_screen.dart';
+import 'international_comparison_screen.dart';
 
 class FindingsScreen extends StatefulWidget {
   final String inspectionId;
@@ -105,6 +106,21 @@ class _FindingsScreenState extends State<FindingsScreen> {
         foregroundColor: Colors.white,
         actions: [
           IconButton(
+            icon: const Icon(Icons.public),
+            tooltip: 'International Rules & Bans',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => InternationalComparisonScreen(
+                    inspectionId: widget.inspectionId,
+                    inspectionNumber: widget.inspectionNumber,
+                  ),
+                ),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _fetchFindings,
           ),
@@ -126,27 +142,52 @@ class _FindingsScreenState extends State<FindingsScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('${_findings.length} Statutory Rules Evaluated', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                              ElevatedButton.icon(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => ReportScreen(
-                                        inspectionId: widget.inspectionId,
-                                        inspectionNumber: widget.inspectionNumber,
-                                      ),
+                              Text('${_findings.length} Rules Evaluated', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                              Row(
+                                children: [
+                                  OutlinedButton.icon(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => InternationalComparisonScreen(
+                                            inspectionId: widget.inspectionId,
+                                            inspectionNumber: widget.inspectionNumber,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    icon: const Icon(Icons.public, size: 14),
+                                    label: const Text('Intl. Rules', style: TextStyle(fontSize: 12)),
+                                    style: OutlinedButton.styleFrom(
+                                      foregroundColor: AppColors.primary,
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                      visualDensity: VisualDensity.compact,
                                     ),
-                                  );
-                                },
-                                icon: const Icon(Icons.description, size: 14),
-                                label: const Text('Official Report', style: TextStyle(fontSize: 12)),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primary,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                  visualDensity: VisualDensity.compact,
-                                ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  ElevatedButton.icon(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => ReportScreen(
+                                            inspectionId: widget.inspectionId,
+                                            inspectionNumber: widget.inspectionNumber,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    icon: const Icon(Icons.description, size: 14),
+                                    label: const Text('Report', style: TextStyle(fontSize: 12)),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.primary,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                      visualDensity: VisualDensity.compact,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
