@@ -91,6 +91,9 @@ storage/processed/*
 !storage/processed/.gitkeep
 storage/reports/*
 !storage/reports/.gitkeep
+storage/area_sessions/*
+!storage/area_sessions/.gitkeep
+scratch/
 
 # IDEs & OS
 .vscode/

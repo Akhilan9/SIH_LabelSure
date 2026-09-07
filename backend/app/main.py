@@ -14,8 +14,9 @@ from backend.app.core.exceptions import (
     create_error_response
 )
 from backend.app.api import (
-    health, auth, inspections, images, analysis, declarations, findings, rules, reports, dashboard, audit, sync
+    health, auth, inspections, images, analysis, declarations, findings, rules, reports, dashboard, audit, sync, area_inspections
 )
+
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -90,3 +91,4 @@ app.include_router(reports.router, prefix=settings.API_PREFIX)
 app.include_router(dashboard.router, prefix=settings.API_PREFIX)
 app.include_router(audit.router, prefix=settings.API_PREFIX)
 app.include_router(sync.router, prefix=settings.API_PREFIX)
+app.include_router(area_inspections.router, prefix=settings.API_PREFIX)
