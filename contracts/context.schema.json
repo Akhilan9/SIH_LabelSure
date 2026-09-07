@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ProductContextSchema",
+  "type": "object",
+  "properties": {
+    "inspection_id": { "type": "string", "format": "uuid" },
+    "commodity_category": {
+      "type": "string",
+      "enum": ["FOOD_BEVERAGE", "COSMETICS_PERSONAL_CARE", "HOUSEHOLD_CLEANING", "ELECTRONICS_APPLIANCES", "PHARMACEUTICAL_MEDICAL", "APPAREL_TEXTILE", "GENERAL_COMMODITY"]
+    },
+    "product_type": { "type": "string" },
+    "is_food": { "type": "boolean" },
+    "is_imported": { "type": "boolean" },
+    "origin_country": { "type": ["string", "null"] },
+    "package_type": {
+      "type": "string",
+      "enum": ["SINGLE_PRE_PACKAGED", "MULTI_PIECE", "COMBINATION", "WHOLESALE", "LOOSE_REPACKAGED"]
+    },
+    "declared_net_quantity": { "type": ["number", "null"] },
+    "declared_unit": { "type": ["string", "null"] },
+    "is_ecommerce": { "type": "boolean", "default": false },
+    "platform_name": { "type": ["string", "null"] },
+    "inspection_date": { "type": "string", "format": "date" },
+    "target_rule_version": { "type": "string", "default": "LMPC-2026-RULES" },
+    "notes": { "type": ["string", "null"] }
+  },
+  "required": ["inspection_id", "commodity_category", "is_food", "is_imported", "package_type", "inspection_date", "target_rule_version"]
+}

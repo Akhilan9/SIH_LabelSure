@@ -1,0 +1,48 @@
+[
+  {
+    "rule_id": "LMPC_2017_R06_10_ECOM_DECLARATIONS",
+    "rule_version": "LMPC-2017-AMENDMENT",
+    "clause_reference": "Rule 6(10)",
+    "requirement": "E-Commerce entity mandatory display of packaged commodity declarations",
+    "applicability": {
+      "is_ecommerce": true
+    },
+    "validation_logic": {
+      "field": "ECOM_MANDATORY_FIELDS",
+      "operator": "COMPOSITE_AND",
+      "composite_conditions": [
+        { "field": "COMMON_GENERIC_NAME", "operator": "EXISTS" },
+        { "field": "MANUFACTURER", "operator": "EXISTS" },
+        { "field": "NET_QUANTITY", "operator": "EXISTS" },
+        { "field": "MRP", "operator": "EXISTS" },
+        { "field": "CONSUMER_CARE", "operator": "EXISTS" }
+      ]
+    },
+    "severity": "CRITICAL",
+    "effective_from": "2018-01-01",
+    "effective_to": null,
+    "source_document": "Legal Metrology (Packaged Commodities) Amendment Rules, 2017 (GSR 629(E))",
+    "source_url": "https://consumeraffairs.gov.in/pages/legal-metrology-act",
+    "notes": "An e-commerce entity shall ensure that the mandatory declarations under sub-rule (1) except the month and year in which the commodity is manufactured or packed, are displayed on the digital marketplace."
+  },
+  {
+    "rule_id": "LMPC_2017_R06_1_IMP_ORIGIN",
+    "rule_version": "LMPC-2017-AMENDMENT",
+    "clause_reference": "Rule 6(1)(a) & Rule 6(10)",
+    "requirement": "Country of origin mandatory on digital marketplaces for imported commodities",
+    "applicability": {
+      "is_ecommerce": true,
+      "is_imported": true
+    },
+    "validation_logic": {
+      "field": "COUNTRY_OF_ORIGIN",
+      "operator": "EXISTS"
+    },
+    "severity": "CRITICAL",
+    "effective_from": "2018-01-01",
+    "effective_to": null,
+    "source_document": "Legal Metrology (Packaged Commodities) Amendment Rules, 2017",
+    "source_url": "https://consumeraffairs.gov.in/pages/legal-metrology-act",
+    "notes": "E-commerce platforms must prominently display Country of Origin for all imported items prior to purchase."
+  }
+]

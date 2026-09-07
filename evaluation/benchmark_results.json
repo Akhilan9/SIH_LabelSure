@@ -1,0 +1,169 @@
+{
+  "timestamp": "2026-09-06 17:39:39 UTC",
+  "total_cases": 10,
+  "correct_decisions": 10,
+  "accuracy_pct": 100.0,
+  "avg_latency_ms": 1737.9,
+  "cases": [
+    {
+      "case_id": "CASE-001",
+      "description": "Fully compliant domestic food package",
+      "expected": "COMPLIANT",
+      "actual": "COMPLIANT",
+      "passed": true,
+      "declarations_extracted": 8,
+      "findings_count": 9,
+      "latency_ms": 2921.8,
+      "summary": {
+        "pass": 8,
+        "fail": 0,
+        "uncertain": 0,
+        "not_applicable": 1
+      }
+    },
+    {
+      "case_id": "CASE-002",
+      "description": "Missing Maximum Retail Price (MRP)",
+      "expected": "NON_COMPLIANT",
+      "actual": "NON_COMPLIANT",
+      "passed": true,
+      "declarations_extracted": 5,
+      "findings_count": 9,
+      "latency_ms": 1513.9,
+      "summary": {
+        "pass": 5,
+        "fail": 3,
+        "uncertain": 0,
+        "not_applicable": 1
+      }
+    },
+    {
+      "case_id": "CASE-003",
+      "description": "Missing Manufacturer / Packer details",
+      "expected": "NON_COMPLIANT",
+      "actual": "NON_COMPLIANT",
+      "passed": true,
+      "declarations_extracted": 5,
+      "findings_count": 9,
+      "latency_ms": 1276.4,
+      "summary": {
+        "pass": 5,
+        "fail": 2,
+        "uncertain": 0,
+        "not_applicable": 2
+      }
+    },
+    {
+      "case_id": "CASE-004",
+      "description": "Imported commodity missing Country of Origin",
+      "expected": "NON_COMPLIANT",
+      "actual": "NON_COMPLIANT",
+      "passed": true,
+      "declarations_extracted": 5,
+      "findings_count": 9,
+      "latency_ms": 1597.0,
+      "summary": {
+        "pass": 4,
+        "fail": 4,
+        "uncertain": 0,
+        "not_applicable": 1
+      }
+    },
+    {
+      "case_id": "CASE-005",
+      "description": "Severely blurred label image requiring re-capture",
+      "expected": "REQUIRES_REVIEW",
+      "actual": "REQUIRES_REVIEW",
+      "passed": true,
+      "declarations_extracted": 0,
+      "findings_count": 9,
+      "latency_ms": 531.5,
+      "summary": {
+        "pass": 0,
+        "fail": 0,
+        "uncertain": 8,
+        "not_applicable": 1
+      }
+    },
+    {
+      "case_id": "CASE-006",
+      "description": "Illegal non-standard unit abbreviation 'gms'",
+      "expected": "NON_COMPLIANT",
+      "actual": "NON_COMPLIANT",
+      "passed": true,
+      "declarations_extracted": 6,
+      "findings_count": 9,
+      "latency_ms": 2063.6,
+      "summary": {
+        "pass": 5,
+        "fail": 3,
+        "uncertain": 0,
+        "not_applicable": 1
+      }
+    },
+    {
+      "case_id": "CASE-007",
+      "description": "Compliant perishable milk with Use By date",
+      "expected": "COMPLIANT",
+      "actual": "COMPLIANT",
+      "passed": true,
+      "declarations_extracted": 8,
+      "findings_count": 9,
+      "latency_ms": 1867.5,
+      "summary": {
+        "pass": 8,
+        "fail": 0,
+        "uncertain": 0,
+        "not_applicable": 1
+      }
+    },
+    {
+      "case_id": "CASE-008",
+      "description": "E-Commerce imported electronics with origin declaration",
+      "expected": "COMPLIANT",
+      "actual": "COMPLIANT",
+      "passed": true,
+      "declarations_extracted": 7,
+      "findings_count": 9,
+      "latency_ms": 1740.1,
+      "summary": {
+        "pass": 6,
+        "fail": 0,
+        "uncertain": 0,
+        "not_applicable": 3
+      }
+    },
+    {
+      "case_id": "CASE-009",
+      "description": "Human correction scenario with Inspector Override",
+      "expected": "COMPLIANT",
+      "actual": "COMPLIANT",
+      "passed": true,
+      "declarations_extracted": 6,
+      "findings_count": 9,
+      "latency_ms": 1436.4,
+      "summary": {
+        "pass": 8,
+        "fail": 0,
+        "uncertain": 0,
+        "not_applicable": 1
+      }
+    },
+    {
+      "case_id": "CASE-010",
+      "description": "Multi-image package (Front + Back label aggregation)",
+      "expected": "COMPLIANT",
+      "actual": "COMPLIANT",
+      "passed": true,
+      "declarations_extracted": 9,
+      "findings_count": 9,
+      "latency_ms": 2430.8,
+      "summary": {
+        "pass": 8,
+        "fail": 0,
+        "uncertain": 0,
+        "not_applicable": 1
+      }
+    }
+  ]
+}

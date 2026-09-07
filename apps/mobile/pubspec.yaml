@@ -1,0 +1,26 @@
+name: labelsure_mobile
+description: "APEX LabelSure - Offline-First Mobile Packaged Commodity Inspection Platform for Legal Metrology Officers"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.0
+  uuid: ^4.3.3
+  intl: ^0.19.0
+  path_provider: ^2.1.2
+  sqflite: ^2.3.2
+  path: ^1.9.0
+  image_picker: ^1.0.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
