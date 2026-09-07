@@ -260,6 +260,24 @@ class _RuleLensScreenState extends State<RuleLensScreen> {
                                         ],
                                       ),
                                     ),
+
+                                    // Why Is It Wrong? – Hazard / Violation Explanation Engine
+                                    if (_selectedFinding!.hazardExplanation != null || _selectedFinding!.finalStatus != 'PASS') ...[
+                                      const SizedBox(height: 14),
+                                      _buildHazardExplanationCard(
+                                        _selectedFinding!.hazardExplanation ??
+                                            HazardExplanationModel(
+                                              detectedIssue: _selectedFinding!.explanation,
+                                              applicableRule: '${_selectedFinding!.clauseReference} of Legal Metrology (Packaged Commodities) Rules, 2011',
+                                              reasonForNonCompliance: 'Declared value "${_selectedFinding!.observedValue ?? "MISSING"}" does not satisfy statutory requirement "${_selectedFinding!.expectedCondition}".',
+                                              consumerHarm: 'Compromises buyer price & specification transparency, exposing consumers to unverified labeling.',
+                                              regulatoryRisk: 'Contravention punishable under Section 36(1) of Legal Metrology Act, 2009.',
+                                              evidenceFromPackage: _selectedFinding!.observedValue != null
+                                                  ? 'Observed declaration: "${_selectedFinding!.observedValue}"'
+                                                  : 'No compliant declaration text observed in camera visual capture.',
+                                            ),
+                                      ),
+                                    ],
                                     const SizedBox(height: 16),
 
                                     // Adjudication Trigger
@@ -295,6 +313,251 @@ class _RuleLensScreenState extends State<RuleLensScreen> {
                     ),
                   ],
                 ),
+    );
+  }
+
+  Widget _buildHazardExplanationCard(HazardExplanationModel hazard) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: const BoxDecoration(
+              color: Color(0xFF0F172A),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(9)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.shield_outlined, color: Color(0xFF38BDF8), size: 16),
+                const SizedBox(width: 8),
+                const Expanded(
+                  child: Text(
+                    'WHY IS IT WRONG? – HAZARD ANALYSIS',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.4,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0284C7).withOpacity(0.25),
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: const Color(0xFF38BDF8), width: 0.8),
+                  ),
+                  child: const Text('5-Step Engine', style: TextStyle(color: Color(0xFF38BDF8), fontSize: 9, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              children: [
+                _buildHazardStep(
+                  stepNum: '1',
+                  title: 'Detected Issue',
+                  icon: Icons.search_rounded,
+                  color: const Color(0xFFEA580C),
+                  content: hazard.detectedIssue,
+                ),
+                const SizedBox(height: 8),
+                _buildHazardStep(
+                  stepNum: '2',
+                  title: 'Applicable Statutory Rule',
+                  icon: Icons.gavel_rounded,
+                  color: const Color(0xFF0284C7),
+                  content: hazard.applicableRule,
+                ),
+                const SizedBox(height: 8),
+                _buildHazardStep(
+                  stepNum: '3',
+                  title: 'Reason for Non-Compliance',
+                  icon: Icons.cancel_outlined,
+                  color: AppColors.failRed,
+                  content: hazard.reasonForNonCompliance,
+                ),
+                const SizedBox(height: 8),
+                _buildHazardRiskStep(
+                  consumerHarm: hazard.consumerHarm,
+                  regulatoryRisk: hazard.regulatoryRisk,
+                ),
+                const SizedBox(height: 8),
+                _buildHazardStep(
+                  stepNum: '5',
+                  title: 'Evidence from Package',
+                  icon: Icons.camera_alt_outlined,
+                  color: const Color(0xFF475569),
+                  content: hazard.evidenceFromPackage,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHazardStep({
+    required String stepNum,
+    required String title,
+    required IconData icon,
+    required Color color,
+    required String content,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 20,
+            height: 20,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.12),
+              shape: BoxShape.circle,
+              border: Border.all(color: color.withOpacity(0.4)),
+            ),
+            child: Text(
+              stepNum,
+              style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(icon, size: 12, color: color),
+                    const SizedBox(width: 4),
+                    Text(
+                      title,
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: color),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  content,
+                  style: const TextStyle(fontSize: 12, height: 1.35, color: AppColors.textMain),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHazardRiskStep({
+    required String consumerHarm,
+    required String regulatoryRisk,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 20,
+            height: 20,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: const Color(0xFFDC2626).withOpacity(0.12),
+              shape: BoxShape.circle,
+              border: Border.all(color: const Color(0xFFDC2626).withOpacity(0.4)),
+            ),
+            child: const Text(
+              '4',
+              style: TextStyle(color: Color(0xFFDC2626), fontSize: 10, fontWeight: FontWeight.bold),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Row(
+                  children: [
+                    Icon(Icons.warning_amber_rounded, size: 12, color: Color(0xFFDC2626)),
+                    SizedBox(width: 4),
+                    Text(
+                      'Potential Consumer & Regulatory Risk',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFFDC2626)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFEF2F2),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: const Color(0xFFFECACA)),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.people_outline, size: 12, color: Color(0xFFDC2626)),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          'Consumer Harm: $consumerHarm',
+                          style: const TextStyle(fontSize: 11, color: Color(0xFF991B1B), height: 1.3),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFFBEB),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: const Color(0xFFFDE68A)),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.policy_outlined, size: 12, color: Color(0xFFD97706)),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          'Regulatory Risk: $regulatoryRisk',
+                          style: const TextStyle(fontSize: 11, color: Color(0xFF92400E), height: 1.3),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

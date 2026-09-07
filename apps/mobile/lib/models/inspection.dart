@@ -273,6 +273,36 @@ class DeclarationModel {
   }
 }
 
+class HazardExplanationModel {
+  final String detectedIssue;
+  final String applicableRule;
+  final String reasonForNonCompliance;
+  final String consumerHarm;
+  final String regulatoryRisk;
+  final String evidenceFromPackage;
+
+  HazardExplanationModel({
+    required this.detectedIssue,
+    required this.applicableRule,
+    required this.reasonForNonCompliance,
+    required this.consumerHarm,
+    required this.regulatoryRisk,
+    required this.evidenceFromPackage,
+  });
+
+  factory HazardExplanationModel.fromJson(Map<String, dynamic> json) {
+    final risks = json['consumer_regulatory_risk'] as Map<String, dynamic>? ?? {};
+    return HazardExplanationModel(
+      detectedIssue: json['detected_issue'] ?? '',
+      applicableRule: json['applicable_rule'] ?? '',
+      reasonForNonCompliance: json['reason_for_non_compliance'] ?? '',
+      consumerHarm: risks['consumer_harm'] ?? json['consumer_harm'] ?? 'Consumer transparency compromised',
+      regulatoryRisk: risks['regulatory_risk'] ?? json['regulatory_risk'] ?? 'Contravention of metrological statute',
+      evidenceFromPackage: json['evidence_from_package'] ?? '',
+    );
+  }
+}
+
 class MobileFinding {
   final String id;
   final String ruleId;
@@ -283,6 +313,7 @@ class MobileFinding {
   final String finalStatus;
   final String severity;
   final String explanation;
+  final HazardExplanationModel? hazardExplanation;
   final String? uncertaintyReason;
   final String? observedValue;
   final String expectedCondition;
@@ -300,6 +331,7 @@ class MobileFinding {
     required this.finalStatus,
     required this.severity,
     required this.explanation,
+    this.hazardExplanation,
     this.uncertaintyReason,
     this.observedValue,
     required this.expectedCondition,
@@ -319,6 +351,9 @@ class MobileFinding {
       finalStatus: json['final_status'] ?? 'UNCERTAIN',
       severity: json['severity'] ?? 'HIGH',
       explanation: json['explanation'] ?? '',
+      hazardExplanation: json['hazard_explanation'] != null
+          ? HazardExplanationModel.fromJson(json['hazard_explanation'])
+          : null,
       uncertaintyReason: json['uncertainty_reason'],
       observedValue: json['observed_value'],
       expectedCondition: json['expected_condition'] ?? '',
@@ -360,6 +395,145 @@ class ReportModel {
       pdfUrl: json['pdf_url'] ?? '',
       pdfSha256: json['pdf_sha256'] ?? '',
       generatedAt: json['generated_at'] ?? '',
+    );
+  }
+}
+
+class FollowUpActionModel {
+  final String actionType;
+  final String statutorySection;
+  final String title;
+  final String description;
+  final String penaltyEstimate;
+  final int deadlineDays;
+  final String priority;
+
+  FollowUpActionModel({
+    required this.actionType,
+    required this.statutorySection,
+    required this.title,
+    required this.description,
+    required this.penaltyEstimate,
+    required this.deadlineDays,
+    this.priority = 'MEDIUM',
+  });
+
+  factory FollowUpActionModel.fromJson(Map<String, dynamic> json) {
+    return FollowUpActionModel(
+      actionType: json['action_type'] ?? '',
+      statutorySection: json['statutory_section'] ?? '',
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      penaltyEstimate: json['penalty_estimate'] ?? 'NIL',
+      deadlineDays: json['deadline_days'] ?? 0,
+      priority: json['priority'] ?? 'MEDIUM',
+    );
+  }
+}
+
+class ComprehensiveReportModel {
+  final String certificateNumber;
+  final String inspectionId;
+  final String inspectionNumber;
+  final String complianceVerdict;
+  final String generatedAt;
+  final String generatedBy;
+  final String pdfUrl;
+  final String pdfSha256;
+
+  // 9 Pillars
+  final Map<String, dynamic> productDetails;
+  final List<DeclarationModel> extractedDeclarations;
+  final List<Map<String, dynamic>> applicableRules;
+  final Map<String, dynamic> complianceStatus;
+  final List<MobileFinding> detectedViolations;
+  final List<InspectionImageModel> visualEvidence;
+  final Map<String, dynamic> inspectorVerification;
+  final Map<String, dynamic> timestamps;
+  final List<FollowUpActionModel> recommendedFollowUpActions;
+
+  ComprehensiveReportModel({
+    required this.certificateNumber,
+    required this.inspectionId,
+    required this.inspectionNumber,
+    required this.complianceVerdict,
+    required this.generatedAt,
+    required this.generatedBy,
+    required this.pdfUrl,
+    required this.pdfSha256,
+    this.productDetails = const {},
+    this.extractedDeclarations = const [],
+    this.applicableRules = const [],
+    this.complianceStatus = const {},
+    this.detectedViolations = const [],
+    this.visualEvidence = const [],
+    this.inspectorVerification = const {},
+    this.timestamps = const {},
+    this.recommendedFollowUpActions = const [],
+  });
+
+  factory ComprehensiveReportModel.fromJson(Map<String, dynamic> json) {
+    var decls = <DeclarationModel>[];
+    if (json['extracted_declarations'] != null) {
+      decls = (json['extracted_declarations'] as List)
+          .map((d) => DeclarationModel.fromJson(d))
+          .toList();
+    }
+
+    var rules = <Map<String, dynamic>>[];
+    if (json['applicable_rules'] != null) {
+      rules = (json['applicable_rules'] as List)
+          .map((r) => Map<String, dynamic>.from(r))
+          .toList();
+    }
+
+    var violations = <MobileFinding>[];
+    if (json['detected_violations'] != null) {
+      violations = (json['detected_violations'] as List)
+          .map((v) => MobileFinding.fromJson(v))
+          .toList();
+    }
+
+    var images = <InspectionImageModel>[];
+    if (json['visual_evidence'] != null) {
+      images = (json['visual_evidence'] as List)
+          .map((i) => InspectionImageModel.fromJson(i))
+          .toList();
+    }
+
+    var actions = <FollowUpActionModel>[];
+    if (json['recommended_follow_up_actions'] != null) {
+      actions = (json['recommended_follow_up_actions'] as List)
+          .map((a) => FollowUpActionModel.fromJson(a))
+          .toList();
+    }
+
+    return ComprehensiveReportModel(
+      certificateNumber: json['certificate_number'] ?? '',
+      inspectionId: json['inspection_id'] ?? '',
+      inspectionNumber: json['inspection_number'] ?? '',
+      complianceVerdict: json['compliance_verdict'] ?? 'PENDING',
+      generatedAt: json['generated_at'] ?? '',
+      generatedBy: json['generated_by'] ?? 'Legal Metrology Officer',
+      pdfUrl: json['pdf_url'] ?? '',
+      pdfSha256: json['pdf_sha256'] ?? '',
+      productDetails: json['product_details'] != null
+          ? Map<String, dynamic>.from(json['product_details'])
+          : {},
+      extractedDeclarations: decls,
+      applicableRules: rules,
+      complianceStatus: json['compliance_status'] != null
+          ? Map<String, dynamic>.from(json['compliance_status'])
+          : {},
+      detectedViolations: violations,
+      visualEvidence: images,
+      inspectorVerification: json['inspector_verification'] != null
+          ? Map<String, dynamic>.from(json['inspector_verification'])
+          : {},
+      timestamps: json['timestamps'] != null
+          ? Map<String, dynamic>.from(json['timestamps'])
+          : {},
+      recommendedFollowUpActions: actions,
     );
   }
 }
