@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../core/api_service.dart';
 import '../core/constants.dart';
 import '../core/storage_service.dart';
@@ -6,6 +7,7 @@ import '../core/sync_manager.dart';
 import '../models/inspection.dart';
 import 'new_inspection_screen.dart';
 import 'camera_screen.dart';
+import 'image_review_screen.dart';
 import 'history_screen.dart';
 import 'settings_screen.dart';
 import 'findings_screen.dart';
@@ -77,124 +79,78 @@ class _MobileHomeScreenState extends State<MobileHomeScreen> {
   }
 
   Future<void> _startInstantCameraScan() async {
-    final user = StorageService().currentUser;
-    final isOffline = !SyncManager().isOnline ||
-        user?.badgeNumber == 'DL-LM-OFFLINE' ||
-        user?.id == 'usr_offline_demo';
-
-    final now = DateTime.now();
-    final timeStr = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
-
-    if (isOffline) {
-      // Instant 0ms local offline launch - zero waiting!
-      _launchOfflineCameraScan(timeStr);
-      return;
-    }
-
-    // If online, show dismissible progress dialog with 2.5-second timeout fallback
-    bool dialogShowing = true;
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (ctx) => Center(
-        child: Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const CircularProgressIndicator(),
-                const SizedBox(height: 16),
-                const Text(
-                  'Launching Camera Scanner...',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                ),
-                const SizedBox(height: 12),
-                TextButton.icon(
-                  onPressed: () {
-                    dialogShowing = false;
-                    Navigator.pop(ctx);
-                    _launchOfflineCameraScan(timeStr);
-                  },
-                  icon: const Icon(Icons.flash_on, size: 16),
-                  label: const Text('Launch Offline Scanner Immediately'),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    ).then((_) {
-      dialogShowing = false;
-    });
-
     try {
-      final inspection = await ApiService().createInspection({
-        'commodity_name': 'Scanned Label ($timeStr)',
-        'rule_version': 'LMPC-2026-RULES',
-        'notes': 'Created via Direct AI Camera Scan',
-        'context': {
-          'commodity_category': 'FOOD',
-          'is_food': true,
-          'origin_country': 'India',
-        }
-      }).timeout(const Duration(milliseconds: 2500));
+      final ImagePicker picker = ImagePicker();
+      final XFile? photo = await picker.pickImage(
+        source: ImageSource.camera,
+        maxWidth: 2400,
+        maxHeight: 2400,
+        imageQuality: 92,
+      );
 
-      if (dialogShowing && mounted) {
-        dialogShowing = false;
-        Navigator.pop(context); // dismiss dialog
+      if (photo == null || !mounted) return;
+
+      final now = DateTime.now();
+      final timeStr = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}';
+      final bytes = await photo.readAsBytes();
+
+      String inspectionId = '';
+      String inspectionNumber = '';
+
+      // Try fast server inspection creation or seamless offline local inspection
+      try {
+        final inspection = await ApiService().createInspection({
+          'commodity_name': 'Scanned Label ($timeStr)',
+          'rule_version': 'LMPC-2026-RULES',
+          'notes': 'Created via Direct Camera Scan',
+          'context': {
+            'commodity_category': 'FOOD',
+            'is_food': true,
+            'origin_country': 'India',
+          }
+        }).timeout(const Duration(milliseconds: 2000));
+        inspectionId = inspection.id;
+        inspectionNumber = inspection.inspectionNumber;
+      } catch (_) {
+        final offlineInsp = SyncManager().createOfflineInspection(
+          commodityName: 'Scanned Label ($timeStr)',
+          notes: 'Created via Direct Camera Scan (Offline Mode)',
+          initialContext: {
+            'commodity_category': 'FOOD',
+            'is_food': true,
+            'origin_country': 'India',
+          },
+        );
+        inspectionId = offlineInsp.localId;
+        inspectionNumber = 'OFFLINE-${offlineInsp.localId.substring(0, 8).toUpperCase()}';
       }
 
       if (!mounted) return;
+
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => CameraScreen(
-            inspectionId: inspection.id,
-            inspectionNumber: inspection.inspectionNumber,
+          builder: (_) => ImageReviewScreen(
+            inspectionId: inspectionId,
+            inspectionNumber: inspectionNumber,
+            capturedImages: [
+              {
+                'bytes': bytes,
+                'view_type': 'FRONT',
+                'name': photo.name,
+                'path': photo.path,
+              }
+            ],
           ),
         ),
       ).then((_) => _loadDashboard());
     } catch (e) {
-      // If server unreachable, timed out or socket failure, auto-fallback to offline scanner
-      if (dialogShowing && mounted) {
-        dialogShowing = false;
-        Navigator.pop(context); // dismiss dialog
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Camera error: ${e.toString().replaceAll("Exception: ", "")}')),
+        );
       }
-
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('⚡ Server unreachable. Launching camera scanner in Offline Field Mode.'),
-          backgroundColor: Colors.blueGrey,
-          duration: Duration(seconds: 2),
-        ),
-      );
-      _launchOfflineCameraScan(timeStr);
     }
-  }
-
-  void _launchOfflineCameraScan(String timeStr) {
-    final offlineInsp = SyncManager().createOfflineInspection(
-      commodityName: 'Scanned Label ($timeStr)',
-      notes: 'Created via Direct AI Camera Scan (Offline Mode)',
-      initialContext: {
-        'commodity_category': 'FOOD',
-        'is_food': true,
-        'origin_country': 'India',
-      },
-    );
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => CameraScreen(
-          inspectionId: offlineInsp.localId,
-          inspectionNumber: 'OFFLINE-${offlineInsp.localId.substring(0, 8).toUpperCase()}',
-        ),
-      ),
-    ).then((_) => _loadDashboard());
   }
 
   @override
