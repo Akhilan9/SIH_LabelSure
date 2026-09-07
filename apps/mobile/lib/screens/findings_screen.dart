@@ -210,6 +210,66 @@ class _FindingsScreenState extends State<FindingsScreen> {
                                         ],
                                       ),
                                     ),
+                                    if (f.explanation.isNotEmpty) ...[
+                                      const SizedBox(height: 8),
+                                      Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          color: f.finalStatus == 'FAIL'
+                                              ? const Color(0xFFFFF1F2)
+                                              : (f.finalStatus == 'UNCERTAIN' ? const Color(0xFFFEF3C7) : const Color(0xFFF0FDF4)),
+                                          borderRadius: BorderRadius.circular(6),
+                                          border: Border.all(
+                                            color: f.finalStatus == 'FAIL'
+                                                ? const Color(0xFFFECDD3)
+                                                : (f.finalStatus == 'UNCERTAIN' ? const Color(0xFFFDE68A) : const Color(0xFFBBF7D0)),
+                                          ),
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  f.finalStatus == 'FAIL'
+                                                      ? Icons.warning_amber_rounded
+                                                      : (f.finalStatus == 'UNCERTAIN' ? Icons.help_outline : Icons.check_circle_outline),
+                                                  size: 14,
+                                                  color: f.finalStatus == 'FAIL'
+                                                      ? AppColors.failRed
+                                                      : (f.finalStatus == 'UNCERTAIN' ? AppColors.uncertainAmber : AppColors.passGreen),
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  f.finalStatus == 'FAIL'
+                                                      ? 'Why This Fails / Statutory Explanation:'
+                                                      : (f.finalStatus == 'UNCERTAIN' ? 'Uncertainty Reason:' : 'Compliance Note:'),
+                                                  style: TextStyle(
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: f.finalStatus == 'FAIL'
+                                                        ? const Color(0xFF991B1B)
+                                                        : (f.finalStatus == 'UNCERTAIN' ? const Color(0xFF92400E) : const Color(0xFF166534)),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 3),
+                                            Text(
+                                              f.explanation,
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                height: 1.35,
+                                                color: f.finalStatus == 'FAIL'
+                                                    ? const Color(0xFF7F1D1D)
+                                                    : (f.finalStatus == 'UNCERTAIN' ? const Color(0xFF78350F) : const Color(0xFF14532D)),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                     const SizedBox(height: 8),
 
                                     if (f.inspectorStatus != null)
