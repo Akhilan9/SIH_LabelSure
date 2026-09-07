@@ -573,3 +573,259 @@ def generate_inspection_pdf(
         "pdf_sha256": file_hash,
         "certificate_number": cert_num
     }
+
+
+def generate_collective_inspection_pdf(
+    area_session: Dict[str, Any],
+    items: List[Dict[str, Any]],
+    output_filename: Optional[str] = None
+) -> Dict[str, str]:
+    """
+    Generates a consolidated collective statutory inspection report for an entire establishment/center,
+    aggregating findings, violation counts, and compliance verdicts across all sampled packaged commodities.
+    """
+    session_id = area_session.get("id", "AREA-UNKNOWN")
+    session_num = area_session.get("session_number", f"AREA-{session_id[:8].upper()}")
+    cert_num = f"LMPC-AREA-CERT-{session_num.replace('AREA-', '')}"
+    est_name = area_session.get("establishment_name", "Commercial Establishment / Packaging Hub")
+    address = area_session.get("address", "Jurisdiction Area / Not Specified")
+    premise_type = area_session.get("premise_type", "RETAIL_ESTABLISHMENT")
+    inspector_name = area_session.get("inspector_name", "Authorized Legal Metrology Inspector")
+    badge_num = area_session.get("inspector_badge", "DL-LM-001")
+    now_str = datetime.datetime.now(datetime.timezone.utc).strftime("%d-%b-%Y %H:%M:%S UTC")
+
+    if not output_filename:
+        output_filename = f"collective_report_{session_id}.pdf"
+
+    pdf_path = str(settings.REPORTS_DIR / output_filename)
+    doc = SimpleDocTemplate(
+        pdf_path,
+        pagesize=A4,
+        leftMargin=36,
+        rightMargin=36,
+        topMargin=36,
+        bottomMargin=36
+    )
+
+    styles = getSampleStyleSheet()
+
+    # Custom Typography Styles
+    header_title_style = ParagraphStyle(
+        "CollHeaderTitle", parent=styles["Normal"],
+        fontName="Helvetica-Bold", fontSize=13, leading=16,
+        alignment=1, textColor=colors.HexColor("#0f172a")
+    )
+    header_sub_style = ParagraphStyle(
+        "CollHeaderSub", parent=styles["Normal"],
+        fontName="Helvetica", fontSize=8.5, leading=11,
+        alignment=1, textColor=colors.HexColor("#475569")
+    )
+    section_title_style = ParagraphStyle(
+        "CollSectionTitle", parent=styles["Normal"],
+        fontName="Helvetica-Bold", fontSize=10.5, leading=13,
+        textColor=colors.HexColor("#0f172a")
+    )
+    cell_bold_style = ParagraphStyle(
+        "CollCellBold", parent=styles["Normal"],
+        fontName="Helvetica-Bold", fontSize=8, leading=10,
+        textColor=colors.HexColor("#1e293b")
+    )
+    cell_style = ParagraphStyle(
+        "CollCellNormal", parent=styles["Normal"],
+        fontName="Helvetica", fontSize=7.5, leading=9.5,
+        textColor=colors.HexColor("#334155")
+    )
+
+    elements = []
+
+    # 1. Official Header
+    elements.append(Paragraph("GOVERNMENT OF INDIA", header_title_style))
+    elements.append(Paragraph("MINISTRY OF CONSUMER AFFAIRS, FOOD & PUBLIC DISTRIBUTION", header_sub_style))
+    elements.append(Paragraph("DEPARTMENT OF CONSUMER AFFAIRS — LEGAL METROLOGY DIVISION", header_sub_style))
+    elements.append(Spacer(1, 4))
+    elements.append(Paragraph("<b>CONSOLIDATED PREMISE INSPECTION REPORT & COLLECTIVE STATUTORY AUDIT</b>", header_title_style))
+    elements.append(Paragraph(f"Statutory Audit Conducted Pursuant to Legal Metrology (Packaged Commodities) Rules, 2011 & 2026", header_sub_style))
+    elements.append(Spacer(1, 8))
+
+    # 2. Establishment & Jurisdiction Box
+    meta_data = [
+        [
+            Paragraph(f"<b>Certificate No:</b> {cert_num}", cell_style),
+            Paragraph(f"<b>Session Reference:</b> {session_num}", cell_style),
+            Paragraph(f"<b>Audit Date:</b> {area_session.get('inspection_date', now_str[:11])}", cell_style)
+        ],
+        [
+            Paragraph(f"<b>Establishment / Area:</b><br/><b>{est_name}</b>", cell_bold_style),
+            Paragraph(f"<b>Premise Category:</b><br/>{premise_type.replace('_', ' ').title()}", cell_style),
+            Paragraph(f"<b>Physical Address:</b><br/>{address}", cell_style)
+        ],
+        [
+            Paragraph(f"<b>Inspecting Officer:</b><br/>{inspector_name}", cell_style),
+            Paragraph(f"<b>Badge / Officer ID:</b><br/>{badge_num}", cell_style),
+            Paragraph(f"<b>Verification Platform:</b><br/>APEX LabelSure AI Engine", cell_style)
+        ]
+    ]
+    meta_table = Table(meta_data, colWidths=[175, 175, 173])
+    meta_table.setStyle(TableStyle([
+        ('BOX', (0, 0), (-1, -1), 0.5, colors.HexColor("#cbd5e1")),
+        ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
+        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor("#f8fafc")),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+    ]))
+    elements.append(meta_table)
+    elements.append(Spacer(1, 10))
+
+    # 3. Compute Collective Metrics
+    total_items = len(items)
+    compliant_items = sum(1 for i in items if i.get("compliance_status") == "COMPLIANT")
+    violation_items = sum(1 for i in items if i.get("compliance_status") == "NON_COMPLIANT")
+    review_items = sum(1 for i in items if i.get("compliance_status") == "REQUIRES_REVIEW")
+    compliance_rate = round((compliant_items / total_items * 100.0), 1) if total_items > 0 else 0.0
+
+    premise_verdict = "NON-COMPLIANT — STATUTORY VIOLATIONS RECORDED" if violation_items > 0 else (
+        "REQUIRES SUPERVISORY REVIEW" if review_items > 0 else "COMPLIANT — ZERO DEFECTS FOUND"
+    )
+    banner_color = colors.HexColor("#b91c1c") if violation_items > 0 else (
+        colors.HexColor("#d97706") if review_items > 0 else colors.HexColor("#15803d")
+    )
+
+    # Premise Verdict Banner
+    verdict_style = ParagraphStyle(
+        "CollVerdictBanner", parent=styles["Normal"],
+        fontName="Helvetica-Bold", fontSize=10.5, leading=14,
+        alignment=1, textColor=colors.white
+    )
+    banner_table = Table([[Paragraph(f"PREMISE COMPLIANCE AUDIT VERDICT: {premise_verdict}", verdict_style)]], colWidths=[523])
+    banner_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), banner_color),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+    ]))
+    elements.append(banner_table)
+    elements.append(Spacer(1, 8))
+
+    # Summary Statistics Grid
+    stats_data = [
+        [
+            Paragraph(f"<b>Total Sampled Commodities</b><br/><font size=12><b>{total_items}</b></font>", cell_style),
+            Paragraph(f"<b>Statutory Compliant (PASS)</b><br/><font size=12 color='#15803d'><b>{compliant_items}</b></font>", cell_style),
+            Paragraph(f"<b>Non-Compliant (VIOLATIONS)</b><br/><font size=12 color='#b91c1c'><b>{violation_items}</b></font>", cell_style),
+            Paragraph(f"<b>Premise Compliance Rate</b><br/><font size=12 color='#1e40af'><b>{compliance_rate}%</b></font>", cell_style),
+        ]
+    ]
+    stats_table = Table(stats_data, colWidths=[130, 131, 131, 131])
+    stats_table.setStyle(TableStyle([
+        ('BOX', (0, 0), (-1, -1), 0.5, colors.HexColor("#cbd5e1")),
+        ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
+        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor("#f1f5f9")),
+        ('TOPPADDING', (0, 0), (-1, -1), 5),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+    ]))
+    elements.append(stats_table)
+    elements.append(Spacer(1, 12))
+
+    # 4. Consolidated Products Schedule
+    elements.append(Paragraph("<b>SCHEDULE OF INSPECTED PACKAGED COMMODITIES AT PREMISE</b>", section_title_style))
+    elements.append(Spacer(1, 4))
+
+    sched_headers = [
+        Paragraph("<b>#</b>", cell_bold_style),
+        Paragraph("<b>Commodity & Brand</b>", cell_bold_style),
+        Paragraph("<b>Declared MRP / Qty</b>", cell_bold_style),
+        Paragraph("<b>Detected Statutory Findings</b>", cell_bold_style),
+        Paragraph("<b>Verdict</b>", cell_bold_style),
+    ]
+    sched_rows = [sched_headers]
+
+    for idx, itm in enumerate(items, 1):
+        st = itm.get("compliance_status", "PENDING")
+        st_color = "#15803d" if st == "COMPLIANT" else ("#b91c1c" if st == "NON_COMPLIANT" else "#d97706")
+        st_label = "PASS" if st == "COMPLIANT" else ("VIOLATION" if st == "NON_COMPLIANT" else "REVIEW")
+
+        c_name = itm.get("commodity_name", "Packaged Commodity")
+        brand = itm.get("brand_name", "")
+        commodity_label = f"<b>{c_name}</b>" + (f"<br/>Brand: {brand}" if brand else "")
+        
+        mrp_val = itm.get("declared_mrp", itm.get("mrp", "N/A"))
+        qty_val = itm.get("declared_net_quantity", itm.get("net_quantity", "N/A"))
+        unit_val = itm.get("declared_unit", itm.get("unit", ""))
+        pricing_label = f"MRP: {mrp_val}<br/>Net Qty: {qty_val} {unit_val}".strip()
+
+        # Format violations
+        viols = itm.get("violations", [])
+        if not viols and st == "COMPLIANT":
+            findings_text = "<font color='#15803d'>All mandatory declarations verified compliant (LMPC Rule 6, 12, 13).</font>"
+        elif viols:
+            findings_text = "<br/>".join([f"• <font color='#b91c1c'>{v}</font>" for v in viols[:4]])
+        else:
+            findings_text = "Pending statutory verification."
+
+        sched_rows.append([
+            Paragraph(str(idx), cell_bold_style),
+            Paragraph(commodity_label, cell_style),
+            Paragraph(pricing_label, cell_style),
+            Paragraph(findings_text, cell_style),
+            Paragraph(f"<font color='{st_color}'><b>{st_label}</b></font>", cell_bold_style),
+        ])
+
+    sched_table = Table(sched_rows, colWidths=[24, 150, 95, 194, 60])
+    sched_table.setStyle(TableStyle([
+        ('BOX', (0, 0), (-1, -1), 0.5, colors.HexColor("#cbd5e1")),
+        ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#e2e8f0")),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+    ]))
+    elements.append(sched_table)
+    elements.append(Spacer(1, 12))
+
+    # 5. Statutory Enforcement Clause
+    legal_text = (
+        "<b>STATUTORY ACTION CLAUSE:</b> For commodities identified with violations in the schedule above, "
+        "the establishment proprietor/manager is hereby put on notice under Rule 32 of the Legal Metrology (Packaged Commodities) "
+        "Rules, 2011 and Section 36 of the Legal Metrology Act, 2009. Non-compliant stock is subject to seizure under Section 15. "
+        "The establishment has 7 statutory working days to submit compounding representations or proof of rectification."
+    )
+    elements.append(Paragraph(legal_text, cell_style))
+    elements.append(Spacer(1, 10))
+
+    # 6. Officer Signature Box
+    sig_data = [
+        [
+            Paragraph(f"<b>Inspecting Legal Metrology Officer:</b><br/>{inspector_name}<br/>Badge: {badge_num}", cell_style),
+            Paragraph("<b>Official Government Seal:</b><br/><br/>___________________________", cell_style),
+            Paragraph(f"<b>Timestamp & SHA-256 Seal:</b><br/>{now_str}<br/>Cert: {cert_num}", cell_style)
+        ]
+    ]
+    sig_table = Table(sig_data, colWidths=[180, 160, 183])
+    sig_table.setStyle(TableStyle([
+        ('BOX', (0, 0), (-1, -1), 0.5, colors.HexColor("#cbd5e1")),
+        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor("#f8fafc")),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+    ]))
+    elements.append(sig_table)
+
+    # Build PDF
+    doc.build(elements)
+
+    # Compute SHA-256
+    sha256 = hashlib.sha256()
+    with open(pdf_path, "rb") as f:
+        while chunk := f.read(8192):
+            sha256.update(chunk)
+    file_hash = sha256.hexdigest()
+
+    return {
+        "pdf_path": pdf_path,
+        "pdf_filename": output_filename,
+        "pdf_url": f"/storage/reports/{output_filename}",
+        "pdf_sha256": file_hash,
+        "certificate_number": cert_num,
+        "total_items": total_items,
+        "compliant_items": compliant_items,
+        "violation_items": violation_items,
+        "compliance_rate": compliance_rate,
+        "premise_verdict": premise_verdict
+    }

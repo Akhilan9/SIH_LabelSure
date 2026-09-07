@@ -363,3 +363,134 @@ class ReportModel {
     );
   }
 }
+
+class AreaItemModel {
+  final String id;
+  final String sessionId;
+  final int itemIndex;
+  final String commodityName;
+  final String brandName;
+  final String mrp;
+  final String netQuantity;
+  final String complianceStatus; // COMPLIANT, NON_COMPLIANT, REQUIRES_REVIEW
+  final List<String> violationsList;
+  final String? imagePath;
+  final String? imageUrl;
+  final double qualityScore;
+  final String ocrSnippet;
+  final String createdAt;
+
+  AreaItemModel({
+    required this.id,
+    required this.sessionId,
+    required this.itemIndex,
+    required this.commodityName,
+    required this.brandName,
+    required this.mrp,
+    required this.netQuantity,
+    required this.complianceStatus,
+    this.violationsList = const [],
+    this.imagePath,
+    this.imageUrl,
+    this.qualityScore = 1.0,
+    this.ocrSnippet = '',
+    required this.createdAt,
+  });
+
+  factory AreaItemModel.fromJson(Map<String, dynamic> json) {
+    var vList = <String>[];
+    if (json['violations_list'] != null) {
+      vList = List<String>.from(json['violations_list']);
+    }
+    return AreaItemModel(
+      id: json['id'] ?? '',
+      sessionId: json['session_id'] ?? '',
+      itemIndex: json['item_index'] ?? 1,
+      commodityName: json['commodity_name'] ?? 'Packaged Commodity',
+      brandName: json['brand_name'] ?? 'Local Pack',
+      mrp: json['mrp'] ?? 'Not Declared',
+      netQuantity: json['net_quantity'] ?? 'Not Specified',
+      complianceStatus: json['compliance_status'] ?? 'PENDING',
+      violationsList: vList,
+      imagePath: json['image_path'],
+      imageUrl: json['image_url'],
+      qualityScore: (json['quality_score'] as num?)?.toDouble() ?? 1.0,
+      ocrSnippet: json['ocr_snippet'] ?? '',
+      createdAt: json['created_at'] ?? '',
+    );
+  }
+}
+
+class AreaSessionModel {
+  final String id;
+  final String sessionNumber;
+  final String establishmentName;
+  final String premiseType;
+  final String address;
+  final String district;
+  final String inspectorName;
+  final String inspectorBadge;
+  final String? notes;
+  final String inspectionDate;
+  final String status;
+  final String complianceVerdict;
+  final int totalItems;
+  final int compliantItems;
+  final int violationItems;
+  final int reviewItems;
+  final double complianceRate;
+  final List<AreaItemModel> items;
+  final Map<String, dynamic>? report;
+
+  AreaSessionModel({
+    required this.id,
+    required this.sessionNumber,
+    required this.establishmentName,
+    required this.premiseType,
+    required this.address,
+    required this.district,
+    required this.inspectorName,
+    required this.inspectorBadge,
+    this.notes,
+    required this.inspectionDate,
+    required this.status,
+    required this.complianceVerdict,
+    required this.totalItems,
+    required this.compliantItems,
+    required this.violationItems,
+    required this.reviewItems,
+    required this.complianceRate,
+    this.items = const [],
+    this.report,
+  });
+
+  factory AreaSessionModel.fromJson(Map<String, dynamic> json) {
+    var itemsList = <AreaItemModel>[];
+    if (json['items'] != null) {
+      itemsList = (json['items'] as List)
+          .map((i) => AreaItemModel.fromJson(i))
+          .toList();
+    }
+    return AreaSessionModel(
+      id: json['id'] ?? '',
+      sessionNumber: json['session_number'] ?? '',
+      establishmentName: json['establishment_name'] ?? '',
+      premiseType: json['premise_type'] ?? 'RETAIL_SUPERMARKET',
+      address: json['address'] ?? '',
+      district: json['district'] ?? '',
+      inspectorName: json['inspector_name'] ?? '',
+      inspectorBadge: json['inspector_badge'] ?? '',
+      notes: json['notes'],
+      inspectionDate: json['inspection_date'] ?? '',
+      status: json['status'] ?? 'ACTIVE',
+      complianceVerdict: json['compliance_verdict'] ?? 'PENDING',
+      totalItems: json['total_items'] ?? itemsList.length,
+      compliantItems: json['compliant_items'] ?? 0,
+      violationItems: json['violation_items'] ?? 0,
+      reviewItems: json['review_items'] ?? 0,
+      complianceRate: (json['compliance_rate'] as num?)?.toDouble() ?? 0.0,
+      items: itemsList,
+      report: json['report'],
+    );
+  }
+}
