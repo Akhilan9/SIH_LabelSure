@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../core/api_service.dart';
 import '../core/constants.dart';
 import '../core/storage_service.dart';
+import '../models/inspection.dart';
 import 'home_screen.dart';
 import 'settings_screen.dart';
 
@@ -30,7 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      final user = await ApiService().login(
+      await ApiService().login(
         _usernameController.text.trim(),
         _passwordController.text.trim(),
       );
@@ -49,6 +50,105 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  void _loginOffline() {
+    final offlineUser = UserModel(
+      id: 'usr_offline_demo',
+      username: 'field_inspector',
+      fullName: 'Field Officer (Offline Mode)',
+      email: 'inspector@labelsure.gov.in',
+      role: 'INSPECTOR',
+      badgeNumber: 'DL-LM-OFFLINE',
+    );
+    StorageService().setAuth('offline_token_local', offlineUser);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('⚡ Logged in under Offline Field Mode. Camera & Local RuleLens active!'),
+        backgroundColor: Color(0xFF10B981),
+      ),
+    );
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const MobileHomeScreen()),
+    );
+  }
+
+  void _showServerConfigDialog() {
+    final controller = TextEditingController(text: StorageService().baseUrl);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.dns_outlined, color: AppColors.primary),
+            SizedBox(width: 8),
+            Text('Server Connection IP', style: TextStyle(fontSize: 16)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Enter your computer\'s Wi-Fi IP address so your phone can reach the backend server over local Wi-Fi:',
+              style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                labelText: 'Backend Base URL',
+                hintText: 'http://172.21.179.103:8000',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              ),
+            ),
+            const SizedBox(height: 14),
+            const Text('Quick Select Preset:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 6,
+              runSpacing: 4,
+              children: [
+                ActionChip(
+                  label: const Text('PC Wi-Fi (172.21.179.103)', style: TextStyle(fontSize: 10)),
+                  onPressed: () => controller.text = 'http://172.21.179.103:8000',
+                ),
+                ActionChip(
+                  label: const Text('Emulator (10.0.2.2)', style: TextStyle(fontSize: 10)),
+                  onPressed: () => controller.text = 'http://10.0.2.2:8000',
+                ),
+                ActionChip(
+                  label: const Text('Localhost (127.0.0.1)', style: TextStyle(fontSize: 10)),
+                  onPressed: () => controller.text = 'http://127.0.0.1:8000',
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final newUrl = controller.text.trim();
+              if (newUrl.isNotEmpty) {
+                StorageService().setBaseUrl(newUrl);
+                setState(() => _errorMessage = null);
+              }
+              Navigator.pop(ctx);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+            child: const Text('Save & Apply'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _fillPreset(String u, String p) {
@@ -75,63 +175,44 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: 64,
                   height: 64,
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppColors.primary, Color(0xFF10B981)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                    color: AppColors.primary,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.35),
-                        blurRadius: 16,
-                        offset: const Offset(0, 6),
+                        color: AppColors.primary.withOpacity(0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.shield_outlined, color: Colors.white, size: 36),
+                  child: const Center(
+                    child: Icon(Icons.verified_user, color: Colors.white, size: 34),
+                  ),
                 ),
                 const SizedBox(height: 16),
 
-                // App Titles
+                // Title
                 const Text(
                   AppConstants.appName,
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textMain,
                   ),
                 ),
                 const SizedBox(height: 4),
                 const Text(
-                  'Department of Consumer Affairs, GoI',
-                  style: TextStyle(fontSize: 13, color: AppColors.textMuted),
+                  'Legal Metrology Field Inspection Platform',
+                  style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                 ),
-                const SizedBox(height: 2),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryLight,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Text(
-                    'LEGAL METROLOGY FIELD INSPECTOR',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 28),
+                const SizedBox(height: 24),
 
-                // Login Card
+                // Login Form Card
                 Container(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: AppColors.border),
                     boxShadow: [
                       BoxShadow(
@@ -146,7 +227,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        if (_errorMessage != null)
+                        // Error Banner
+                        if (_errorMessage != null) ...[
                           Container(
                             padding: const EdgeInsets.all(12),
                             margin: const EdgeInsets.only(bottom: 16),
@@ -155,25 +237,56 @@ class _LoginScreenState extends State<LoginScreen> {
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(color: AppColors.failBorder),
                             ),
-                            child: Row(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(Icons.error_outline, color: AppColors.failRed, size: 18),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    _errorMessage!,
-                                    style: const TextStyle(fontSize: 12, color: AppColors.failRed),
-                                  ),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.error_outline, color: AppColors.failRed, size: 18),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        _errorMessage!,
+                                        style: const TextStyle(fontSize: 11, color: AppColors.failRed, height: 1.4),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  children: [
+                                    OutlinedButton.icon(
+                                      onPressed: _showServerConfigDialog,
+                                      icon: const Icon(Icons.settings, size: 14),
+                                      label: const Text('Change IP', style: TextStyle(fontSize: 11)),
+                                      style: OutlinedButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                        foregroundColor: AppColors.primary,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    ElevatedButton.icon(
+                                      onPressed: _loginOffline,
+                                      icon: const Icon(Icons.offline_pin, size: 14),
+                                      label: const Text('Work Offline', style: TextStyle(fontSize: 11)),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(0xFF10B981),
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
                           ),
+                        ],
 
                         // Username Field
                         TextFormField(
                           controller: _usernameController,
                           decoration: InputDecoration(
-                            labelText: 'Officer Username',
+                            labelText: 'Officer Username / Badge',
                             prefixIcon: const Icon(Icons.person_outline, size: 20),
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                             contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -217,15 +330,29 @@ class _LoginScreenState extends State<LoginScreen> {
                                 )
                               : const Text('Authenticate & Sign In', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                         ),
+                        const SizedBox(height: 10),
+
+                        // Offline Mode Button
+                        OutlinedButton.icon(
+                          onPressed: _isLoading ? null : _loginOffline,
+                          icon: const Icon(Icons.offline_bolt_outlined, size: 18),
+                          label: const Text('Continue in Offline / Field Mode (Demo)', style: TextStyle(fontSize: 12)),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 11),
+                            side: const BorderSide(color: Color(0xFF10B981)),
+                            foregroundColor: const Color(0xFF059669),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
 
                 // Demo Presets
                 const Text('One-Click Demo Credentials:', style: TextStyle(fontSize: 11, color: AppColors.textMuted)),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 Wrap(
                   spacing: 8,
                   runSpacing: 6,
@@ -245,15 +372,39 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
 
-                // Settings link for changing server IP
-                TextButton.icon(
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
-                  },
-                  icon: const Icon(Icons.settings_outlined, size: 16),
-                  label: Text('Server URL: ${StorageService().baseUrl}', style: const TextStyle(fontSize: 11)),
+                // Server Config Banner
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.dns_outlined, size: 14, color: AppColors.primary),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Server: ${StorageService().baseUrl}',
+                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textMain),
+                      ),
+                      const SizedBox(width: 8),
+                      InkWell(
+                        onTap: _showServerConfigDialog,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryLight,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text('Configure IP', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

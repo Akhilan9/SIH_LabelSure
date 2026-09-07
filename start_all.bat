@@ -5,7 +5,7 @@ echo        Starting APEX LabelSure Services
 echo ===================================================
 
 echo [1/3] Launching FastAPI Backend (Port 8000)...
-start "APEX LabelSure Backend" powershell -NoExit -Command "cd /d D:\Akhi\Projects\LabelSure; python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload"
+start "APEX LabelSure Backend" powershell -NoExit -Command "cd /d D:\Akhi\Projects\LabelSure; python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload"
 
 echo [2/3] Launching React Admin Web Dashboard (Port 5173)...
 start "APEX LabelSure Web Admin" powershell -NoExit -Command "cd /d D:\Akhi\Projects\LabelSure\apps\admin-web; npm run dev"

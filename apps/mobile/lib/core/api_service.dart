@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -28,20 +29,30 @@ class ApiService {
 
   // 1. Authentication
   Future<UserModel> login(String username, String password) async {
-    final res = await http.post(
-      Uri.parse('$_baseUrl/api/auth/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'username': username, 'password': password}),
-    );
+    try {
+      final res = await http.post(
+        Uri.parse('$_baseUrl/api/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'username': username, 'password': password}),
+      ).timeout(const Duration(seconds: 7));
 
-    if (res.statusCode == 200) {
-      final data = jsonDecode(res.body);
-      final user = UserModel.fromJson(data);
-      _storage.setAuth(data['access_token'], user);
-      return user;
-    } else {
-      final err = jsonDecode(res.body);
-      throw Exception(err['error']?['message'] ?? 'Login failed (${res.statusCode})');
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
+        final user = UserModel.fromJson(data);
+        _storage.setAuth(data['access_token'], user);
+        return user;
+      } else {
+        final err = jsonDecode(res.body);
+        throw Exception(err['error']?['message'] ?? 'Login failed (${res.statusCode})');
+      }
+    } on TimeoutException {
+      throw Exception('Server unreachable at $_baseUrl (connection timed out).\nPlease verify your phone and PC are on the same Wi-Fi, or tap "Work Offline" below.');
+    } catch (e) {
+      final msg = e.toString().toLowerCase();
+      if (msg.contains('socketexception') || msg.contains('connection refused') || msg.contains('failed host lookup') || msg.contains('network is unreachable')) {
+        throw Exception('Cannot reach backend server at $_baseUrl.\nTap "Configure Server IP" below to configure your PC\'s Wi-Fi IP.');
+      }
+      rethrow;
     }
   }
 
