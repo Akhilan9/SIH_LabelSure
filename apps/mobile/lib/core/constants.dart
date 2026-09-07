@@ -43,7 +43,9 @@ class AppConstants {
   static const String appTagline = 'Legal Metrology Compliance Inspector';
   
   // Default Backend URL
-  // 10.0.2.2 is Android emulator host loopback, 127.0.0.1 for web and desktop
-  static String get defaultBaseUrl => kIsWeb ? 'http://127.0.0.1:8000' : 'http://10.0.2.2:8000';
+  // 192.168.0.219 is PC LAN IP for physical Android phone, 127.0.0.1 for web and desktop
+  static String get defaultBaseUrl => kIsWeb ? 'http://127.0.0.1:8000' : 'http://192.168.0.219:8000';
   static const String desktopBaseUrl = 'http://127.0.0.1:8000';
+  static const String lanBaseUrl = 'http://192.168.0.219:8000';
+  static const String emulatorBaseUrl = 'http://10.0.2.2:8000';
 }
