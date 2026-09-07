@@ -1,0 +1,46 @@
+[
+  {
+    "rule_id": "LMPC_2021_R06_1_DA_USP",
+    "rule_version": "LMPC-2021-AMENDMENT",
+    "clause_reference": "Rule 6(1)(da)",
+    "requirement": "Mandatory Unit Sale Price (USP) declaration on pre-packaged commodities",
+    "applicability": {
+      "package_type": ["SINGLE_PRE_PACKAGED", "MULTI_PIECE", "COMBINATION"]
+    },
+    "validation_logic": {
+      "field": "UNIT_SALE_PRICE",
+      "operator": "EXISTS",
+      "composite_conditions": [
+        { "field": "UNIT_SALE_PRICE.value", "operator": "GREATER_THAN", "value": 0 }
+      ]
+    },
+    "severity": "HIGH",
+    "effective_from": "2022-12-01",
+    "effective_to": null,
+    "source_document": "Legal Metrology (Packaged Commodities) Amendment Rules, 2021 (GSR 779(E))",
+    "source_url": "https://consumeraffairs.gov.in/pages/legal-metrology-act",
+    "notes": "Declaration of Unit Sale Price in terms of rupees per gram, kilogram, millilitre, litre, metre or number, depending on whether commodity weight/volume is below or above 1 kg/1 l."
+  },
+  {
+    "rule_id": "LMPC_2021_R06_1_DATE_EXPIRY",
+    "rule_version": "LMPC-2021-AMENDMENT",
+    "clause_reference": "Rule 6(1)(d)",
+    "requirement": "Best Before or Use By date mandatory for perishable or food products",
+    "applicability": {
+      "is_food": true
+    },
+    "validation_logic": {
+      "field": "BEST_BEFORE",
+      "operator": "DATE_VALIDATION",
+      "composite_conditions": [
+        { "field": "USE_BY", "operator": "DATE_VALIDATION" }
+      ]
+    },
+    "severity": "CRITICAL",
+    "effective_from": "2022-12-01",
+    "effective_to": null,
+    "source_document": "Legal Metrology (Packaged Commodities) Amendment Rules, 2021",
+    "source_url": "https://consumeraffairs.gov.in/pages/legal-metrology-act",
+    "notes": "Food items must declare 'Best Before' or 'Use By' date or shelf-life in addition to packaging date."
+  }
+]

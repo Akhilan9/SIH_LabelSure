@@ -1,0 +1,155 @@
+[
+  {
+    "rule_id": "LMPC_2011_R06_1_A_MFG",
+    "rule_version": "LMPC-2011-BASE",
+    "clause_reference": "Rule 6(1)(a)",
+    "requirement": "Name and complete address of the manufacturer or packer",
+    "applicability": {
+      "package_type": ["SINGLE_PRE_PACKAGED", "MULTI_PIECE", "COMBINATION"],
+      "is_imported": false
+    },
+    "validation_logic": {
+      "field": "MANUFACTURER",
+      "operator": "EXISTS",
+      "composite_conditions": [
+        { "field": "PACKER", "operator": "EXISTS" }
+      ]
+    },
+    "severity": "CRITICAL",
+    "effective_from": "2011-04-01",
+    "effective_to": null,
+    "source_document": "Legal Metrology (Packaged Commodities) Rules, 2011",
+    "source_url": "https://consumeraffairs.gov.in/pages/legal-metrology-act",
+    "notes": "Every package shall bear the name and complete address of the manufacturer, or where the manufacturer is not the packer, the name and address of manufacturer and packer."
+  },
+  {
+    "rule_id": "LMPC_2011_R06_1_A_IMP",
+    "rule_version": "LMPC-2011-BASE",
+    "clause_reference": "Rule 6(1)(a) & (b)",
+    "requirement": "Name and address of importer and country of origin for imported commodity",
+    "applicability": {
+      "is_imported": true
+    },
+    "validation_logic": {
+      "field": "IMPORTER",
+      "operator": "COMPOSITE_AND",
+      "composite_conditions": [
+        { "field": "IMPORTER", "operator": "EXISTS" },
+        { "field": "COUNTRY_OF_ORIGIN", "operator": "EXISTS" }
+      ]
+    },
+    "severity": "CRITICAL",
+    "effective_from": "2011-04-01",
+    "effective_to": null,
+    "source_document": "Legal Metrology (Packaged Commodities) Rules, 2011",
+    "source_url": "https://consumeraffairs.gov.in/pages/legal-metrology-act",
+    "notes": "For imported packages, the name and address of the importer and country of origin are strictly mandatory."
+  },
+  {
+    "rule_id": "LMPC_2011_R06_1_B_GENERIC",
+    "rule_version": "LMPC-2011-BASE",
+    "clause_reference": "Rule 6(1)(b)",
+    "requirement": "Common or generic name of the commodity",
+    "applicability": {
+      "package_type": ["SINGLE_PRE_PACKAGED", "MULTI_PIECE", "COMBINATION", "WHOLESALE"]
+    },
+    "validation_logic": {
+      "field": "COMMON_GENERIC_NAME",
+      "operator": "EXISTS",
+      "composite_conditions": [
+        { "field": "PRODUCT_NAME", "operator": "EXISTS" }
+      ]
+    },
+    "severity": "HIGH",
+    "effective_from": "2011-04-01",
+    "effective_to": null,
+    "source_document": "Legal Metrology (Packaged Commodities) Rules, 2011",
+    "source_url": "https://consumeraffairs.gov.in/pages/legal-metrology-act",
+    "notes": "The common or generic name of the commodity contained in the package must be clearly stated."
+  },
+  {
+    "rule_id": "LMPC_2011_R06_1_C_NET_QTY",
+    "rule_version": "LMPC-2011-BASE",
+    "clause_reference": "Rule 6(1)(c) & Rule 13",
+    "requirement": "Net quantity in standard metric units",
+    "applicability": {
+      "package_type": ["SINGLE_PRE_PACKAGED", "MULTI_PIECE", "COMBINATION", "WHOLESALE"]
+    },
+    "validation_logic": {
+      "field": "NET_QUANTITY",
+      "operator": "UNIT_VALIDATION",
+      "composite_conditions": [
+        { "field": "NET_QUANTITY.value", "operator": "GREATER_THAN", "value": 0 }
+      ]
+    },
+    "severity": "CRITICAL",
+    "effective_from": "2011-04-01",
+    "effective_to": null,
+    "source_document": "Legal Metrology (Packaged Commodities) Rules, 2011",
+    "source_url": "https://consumeraffairs.gov.in/pages/legal-metrology-act",
+    "notes": "Net quantity must be declared in metric units (g, kg, ml, l, m, cm, mm, N, U). Non-metric or non-compliant abbreviations (e.g., 'gms', 'kgs', 'ltrs') are illegal."
+  },
+  {
+    "rule_id": "LMPC_2011_R06_1_D_DATE",
+    "rule_version": "LMPC-2011-BASE",
+    "clause_reference": "Rule 6(1)(d)",
+    "requirement": "Month and year of manufacture or packing",
+    "applicability": {
+      "is_ecommerce": false
+    },
+    "validation_logic": {
+      "field": "MANUFACTURE_DATE",
+      "operator": "DATE_VALIDATION",
+      "composite_conditions": [
+        { "field": "PACK_DATE", "operator": "DATE_VALIDATION" }
+      ]
+    },
+    "severity": "HIGH",
+    "effective_from": "2011-04-01",
+    "effective_to": null,
+    "source_document": "Legal Metrology (Packaged Commodities) Rules, 2011",
+    "source_url": "https://consumeraffairs.gov.in/pages/legal-metrology-act",
+    "notes": "Month and year of manufacture or pre-packing must be declared on physical packages."
+  },
+  {
+    "rule_id": "LMPC_2011_R06_1_E_MRP",
+    "rule_version": "LMPC-2011-BASE",
+    "clause_reference": "Rule 6(1)(e)",
+    "requirement": "Maximum Retail Price (MRP) inclusive of all taxes",
+    "applicability": {
+      "package_type": ["SINGLE_PRE_PACKAGED", "MULTI_PIECE", "COMBINATION"]
+    },
+    "validation_logic": {
+      "field": "MRP",
+      "operator": "EXISTS",
+      "composite_conditions": [
+        { "field": "MRP.value", "operator": "GREATER_THAN", "value": 0 }
+      ]
+    },
+    "severity": "CRITICAL",
+    "effective_from": "2011-04-01",
+    "effective_to": null,
+    "source_document": "Legal Metrology (Packaged Commodities) Rules, 2011",
+    "source_url": "https://consumeraffairs.gov.in/pages/legal-metrology-act",
+    "notes": "MRP in format 'MRP ₹ xx.xx (incl. of all taxes)' or 'MRP Rs. xx.xx incl. of all taxes'."
+  },
+  {
+    "rule_id": "LMPC_2011_R06_1_F_CONSUMER_CARE",
+    "rule_version": "LMPC-2011-BASE",
+    "clause_reference": "Rule 6(1)(f)",
+    "requirement": "Consumer grievance details (Address, Tel, Email)",
+    "applicability": {
+      "package_type": ["SINGLE_PRE_PACKAGED", "MULTI_PIECE", "COMBINATION"]
+    },
+    "validation_logic": {
+      "field": "CONSUMER_CARE",
+      "operator": "EXISTS"
+    },
+    "severity": "HIGH",
+    "effective_from": "2011-04-01",
+    "effective_to": null,
+    "source_document": "Legal Metrology (Packaged Commodities) Rules, 2011",
+    "source_url": "https://consumeraffairs.gov.in/pages/legal-metrology-act",
+    "notes": "Name, address, telephone number, and email of person or office to contact for consumer complaints."
+  }
+]

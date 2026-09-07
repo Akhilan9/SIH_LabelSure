@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LegalMetrologyRuleSchema",
+  "description": "Standard schema for versioned Legal Metrology (Packaged Commodities) statutory rules",
+  "type": "object",
+  "properties": {
+    "rule_id": { "type": "string", "pattern": "^[A-Z0-9_\\-]+$" },
+    "rule_version": { "type": "string" },
+    "clause_reference": { "type": "string" },
+    "requirement": { "type": "string" },
+    "applicability": {
+      "type": "object",
+      "properties": {
+        "commodity_categories": { "type": "array", "items": { "type": "string" } },
+        "package_type": {
+          "oneOf": [
+            { "type": "string" },
+            { "type": "array", "items": { "type": "string" } }
+          ]
+        },
+        "is_imported": { "type": ["boolean", "null"] },
+        "is_food": { "type": ["boolean", "null"] },
+        "is_ecommerce": { "type": ["boolean", "null"] }
+      }
+    },
+    "validation_logic": {
+      "type": "object",
+      "properties": {
+        "field": { "type": "string" },
+        "operator": {
+          "type": "string",
+          "enum": [
+            "EXISTS",
+            "NOT_EXISTS",
+            "EQUALS",
+            "NOT_EQUALS",
+            "GREATER_THAN",
+            "LESS_THAN",
+            "BETWEEN",
+            "REGEX",
+            "UNIT_VALIDATION",
+            "DATE_VALIDATION",
+            "COMPOSITE_AND",
+            "COMPOSITE_OR"
+          ]
+        },
+        "value": {},
+        "min_value": { "type": "number" },
+        "max_value": { "type": "number" },
+        "pattern": { "type": "string" },
+        "composite_conditions": {
+          "type": "array",
+          "items": { "$ref": "#/properties/validation_logic" }
+        }
+      },
+      "required": ["operator"]
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFORMATIONAL"]
+    },
+    "effective_from": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "effective_to": { "type": ["string", "null"], "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "source_document": { "type": "string" },
+    "source_url": { "type": "string" },
+    "notes": { "type": ["string", "null"] }
+  },
+  "required": [
+    "rule_id",
+    "rule_version",
+    "clause_reference",
+    "requirement",
+    "applicability",
+    "validation_logic",
+    "severity",
+    "effective_from",
+    "source_document",
+    "source_url"
+  ]
+}

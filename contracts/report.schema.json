@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ReportSchema",
+  "type": "object",
+  "properties": {
+    "report_id": { "type": "string", "format": "uuid" },
+    "inspection_id": { "type": "string", "format": "uuid" },
+    "certificate_number": { "type": "string" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "generated_by": { "type": "string" },
+    "compliance_verdict": {
+      "type": "string",
+      "enum": ["COMPLIANT", "NON_COMPLIANT", "REQUIRES_REVIEW"]
+    },
+    "pdf_url": { "type": "string" },
+    "pdf_sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "total_rules_evaluated": { "type": "integer" },
+        "passed": { "type": "integer" },
+        "failed": { "type": "integer" },
+        "uncertain": { "type": "integer" },
+        "not_applicable": { "type": "integer" },
+        "critical_violations": { "type": "integer" },
+        "inspector_overrides": { "type": "integer" }
+      },
+      "required": ["total_rules_evaluated", "passed", "failed", "uncertain", "not_applicable", "critical_violations"]
+    },
+    "model_versions": {
+      "type": "object",
+      "properties": {
+        "ocr_engine": { "type": "string" },
+        "cv_pipeline": { "type": "string" },
+        "rule_version": { "type": "string" }
+      },
+      "required": ["ocr_engine", "rule_version"]
+    }
+  },
+  "required": ["report_id", "inspection_id", "certificate_number", "generated_at", "compliance_verdict", "pdf_url", "pdf_sha256", "summary"]
+}

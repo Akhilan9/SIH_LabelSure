@@ -1,0 +1,199 @@
+[
+  {
+    "rule_id": "LMPC_2026_R06_1_A_MFG",
+    "rule_version": "LMPC-2026-RULES",
+    "clause_reference": "Rule 6(1)(a)",
+    "requirement": "Name and complete physical address of the manufacturer or packer",
+    "applicability": {
+      "package_type": ["SINGLE_PRE_PACKAGED", "MULTI_PIECE", "COMBINATION"],
+      "is_imported": false
+    },
+    "validation_logic": {
+      "field": "MANUFACTURER",
+      "operator": "EXISTS",
+      "composite_conditions": [
+        { "field": "PACKER", "operator": "EXISTS" }
+      ]
+    },
+    "severity": "CRITICAL",
+    "effective_from": "2026-01-01",
+    "effective_to": null,
+    "source_document": "Legal Metrology (Packaged Commodities) Modernized Compliance Rules, 2026",
+    "source_url": "https://consumeraffairs.gov.in/pages/legal-metrology-act",
+    "notes": "Every package must clearly declare manufacturer name, street address, and PIN code."
+  },
+  {
+    "rule_id": "LMPC_2026_R06_1_A_IMP",
+    "rule_version": "LMPC-2026-RULES",
+    "clause_reference": "Rule 6(1)(a) & (10)",
+    "requirement": "Mandatory country of origin and importer details for imported commodities",
+    "applicability": {
+      "is_imported": true
+    },
+    "validation_logic": {
+      "field": "IMPORTER",
+      "operator": "COMPOSITE_AND",
+      "composite_conditions": [
+        { "field": "IMPORTER", "operator": "EXISTS" },
+        { "field": "COUNTRY_OF_ORIGIN", "operator": "EXISTS" }
+      ]
+    },
+    "severity": "CRITICAL",
+    "effective_from": "2026-01-01",
+    "effective_to": null,
+    "source_document": "Legal Metrology (Packaged Commodities) Modernized Compliance Rules, 2026",
+    "source_url": "https://consumeraffairs.gov.in/pages/legal-metrology-act",
+    "notes": "For all imported commodities, both importer identification and country of origin must be prominently declared."
+  },
+  {
+    "rule_id": "LMPC_2026_R06_1_B_GENERIC",
+    "rule_version": "LMPC-2026-RULES",
+    "clause_reference": "Rule 6(1)(b)",
+    "requirement": "Common or generic name of the commodity",
+    "applicability": {
+      "package_type": ["SINGLE_PRE_PACKAGED", "MULTI_PIECE", "COMBINATION", "WHOLESALE"]
+    },
+    "validation_logic": {
+      "field": "COMMON_GENERIC_NAME",
+      "operator": "EXISTS",
+      "composite_conditions": [
+        { "field": "PRODUCT_NAME", "operator": "EXISTS" }
+      ]
+    },
+    "severity": "HIGH",
+    "effective_from": "2026-01-01",
+    "effective_to": null,
+    "source_document": "Legal Metrology (Packaged Commodities) Modernized Compliance Rules, 2026",
+    "source_url": "https://consumeraffairs.gov.in/pages/legal-metrology-act",
+    "notes": "The generic commodity name must prevent deception or confusion regarding package contents."
+  },
+  {
+    "rule_id": "LMPC_2026_R06_1_C_NET_QTY",
+    "rule_version": "LMPC-2026-RULES",
+    "clause_reference": "Rule 6(1)(c) & Rule 13",
+    "requirement": "Net quantity in standard metric units without non-standard symbols",
+    "applicability": {
+      "package_type": ["SINGLE_PRE_PACKAGED", "MULTI_PIECE", "COMBINATION", "WHOLESALE"]
+    },
+    "validation_logic": {
+      "field": "NET_QUANTITY",
+      "operator": "UNIT_VALIDATION",
+      "composite_conditions": [
+        { "field": "NET_QUANTITY.value", "operator": "GREATER_THAN", "value": 0 }
+      ]
+    },
+    "severity": "CRITICAL",
+    "effective_from": "2026-01-01",
+    "effective_to": null,
+    "source_document": "Legal Metrology (Packaged Commodities) Modernized Compliance Rules, 2026",
+    "source_url": "https://consumeraffairs.gov.in/pages/legal-metrology-act",
+    "notes": "Net quantity declaration in SI metric units. Symbols 'gms', 'kgs', 'ltrs', 'ml.' are explicitly non-compliant."
+  },
+  {
+    "rule_id": "LMPC_2026_R06_1_D_DATE",
+    "rule_version": "LMPC-2026-RULES",
+    "clause_reference": "Rule 6(1)(d)",
+    "requirement": "Month and year of manufacture / packing / import",
+    "applicability": {
+      "is_ecommerce": false
+    },
+    "validation_logic": {
+      "field": "MANUFACTURE_DATE",
+      "operator": "DATE_VALIDATION",
+      "composite_conditions": [
+        { "field": "PACK_DATE", "operator": "DATE_VALIDATION" }
+      ]
+    },
+    "severity": "HIGH",
+    "effective_from": "2026-01-01",
+    "effective_to": null,
+    "source_document": "Legal Metrology (Packaged Commodities) Modernized Compliance Rules, 2026",
+    "source_url": "https://consumeraffairs.gov.in/pages/legal-metrology-act",
+    "notes": "Month and year of packaging must be declared on physical packages."
+  },
+  {
+    "rule_id": "LMPC_2026_R06_1_DA_USP",
+    "rule_version": "LMPC-2026-RULES",
+    "clause_reference": "Rule 6(1)(da)",
+    "requirement": "Mandatory Unit Sale Price (USP) declaration",
+    "applicability": {
+      "package_type": ["SINGLE_PRE_PACKAGED", "MULTI_PIECE", "COMBINATION"]
+    },
+    "validation_logic": {
+      "field": "UNIT_SALE_PRICE",
+      "operator": "EXISTS",
+      "composite_conditions": [
+        { "field": "UNIT_SALE_PRICE.value", "operator": "GREATER_THAN", "value": 0 }
+      ]
+    },
+    "severity": "HIGH",
+    "effective_from": "2026-01-01",
+    "effective_to": null,
+    "source_document": "Legal Metrology (Packaged Commodities) Modernized Compliance Rules, 2026",
+    "source_url": "https://consumeraffairs.gov.in/pages/legal-metrology-act",
+    "notes": "Unit sale price mandatory for consumer transparent value comparison."
+  },
+  {
+    "rule_id": "LMPC_2026_R06_1_E_MRP",
+    "rule_version": "LMPC-2026-RULES",
+    "clause_reference": "Rule 6(1)(e)",
+    "requirement": "Maximum Retail Price (MRP) inclusive of all taxes",
+    "applicability": {
+      "package_type": ["SINGLE_PRE_PACKAGED", "MULTI_PIECE", "COMBINATION"]
+    },
+    "validation_logic": {
+      "field": "MRP",
+      "operator": "EXISTS",
+      "composite_conditions": [
+        { "field": "MRP.value", "operator": "GREATER_THAN", "value": 0 }
+      ]
+    },
+    "severity": "CRITICAL",
+    "effective_from": "2026-01-01",
+    "effective_to": null,
+    "source_document": "Legal Metrology (Packaged Commodities) Modernized Compliance Rules, 2026",
+    "source_url": "https://consumeraffairs.gov.in/pages/legal-metrology-act",
+    "notes": "The MRP shall be declared in Indian Rupees clearly stating inclusion of all taxes."
+  },
+  {
+    "rule_id": "LMPC_2026_R06_1_F_CONSUMER_CARE",
+    "rule_version": "LMPC-2026-RULES",
+    "clause_reference": "Rule 6(1)(f)",
+    "requirement": "Consumer Care contact details (Address, Tel, Email)",
+    "applicability": {
+      "package_type": ["SINGLE_PRE_PACKAGED", "MULTI_PIECE", "COMBINATION"]
+    },
+    "validation_logic": {
+      "field": "CONSUMER_CARE",
+      "operator": "EXISTS"
+    },
+    "severity": "HIGH",
+    "effective_from": "2026-01-01",
+    "effective_to": null,
+    "source_document": "Legal Metrology (Packaged Commodities) Modernized Compliance Rules, 2026",
+    "source_url": "https://consumeraffairs.gov.in/pages/legal-metrology-act",
+    "notes": "Grievance redressal officer telephone number, email, and postal address."
+  },
+  {
+    "rule_id": "LMPC_2026_R06_FOOD_EXPIRY",
+    "rule_version": "LMPC-2026-RULES",
+    "clause_reference": "Rule 6(1)(d) & FSSAI Alignment",
+    "requirement": "Best Before or Use By date mandatory for food & beverage commodities",
+    "applicability": {
+      "is_food": true
+    },
+    "validation_logic": {
+      "field": "BEST_BEFORE",
+      "operator": "DATE_VALIDATION",
+      "composite_conditions": [
+        { "field": "USE_BY", "operator": "DATE_VALIDATION" }
+      ]
+    },
+    "severity": "CRITICAL",
+    "effective_from": "2026-01-01",
+    "effective_to": null,
+    "source_document": "Legal Metrology (Packaged Commodities) Modernized Compliance Rules, 2026",
+    "source_url": "https://consumeraffairs.gov.in/pages/legal-metrology-act",
+    "notes": "Food items must declare Best Before or Use By date."
+  }
+]

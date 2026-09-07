@@ -1,0 +1,81 @@
+{
+  "governing_body": {
+    "ministry": "Ministry of Consumer Affairs, Food and Public Distribution",
+    "department": "Department of Consumer Affairs",
+    "division": "Legal Metrology Division",
+    "jurisdiction": "Republic of India",
+    "portal_url": "https://consumeraffairs.nic.in"
+  },
+  "statutory_acts": [
+    {
+      "act_title": "The Legal Metrology Act, 2009",
+      "act_number": "Act No. 1 of 2010",
+      "enactment_date": "2010-01-13",
+      "effective_date": "2011-04-01",
+      "official_url": "https://consumeraffairs.nic.in/acts-and-rules/legal-metrology/the-legal-metrology-act-2009",
+      "key_sections": {
+        "Section 18": "Declarations on pre-packaged commodities: No person shall manufacture, pack, sell, distribute, deliver, offer, expose for sale or have in his possession for sale any pre-packaged commodity unless such package is in such standard quantities or number and bears thereon such declarations and markings in such manner as may be prescribed.",
+        "Section 36": "Penalty for selling, etc., of non-standard packages or violation of packaging rules (fine up to Rs. 25,000 for first offence, up to Rs. 50,000 for second, up to Rs. 1,00,000 or imprisonment up to one year for subsequent offences)."
+      }
+    }
+  ],
+  "applicable_rule_versions": [
+    {
+      "version_id": "LMPC-2011-BASE",
+      "title": "Legal Metrology (Packaged Commodities) Rules, 2011",
+      "gazette_notification": "G.S.R. 202(E)",
+      "notification_date": "2011-03-07",
+      "effective_from": "2011-04-01",
+      "effective_to": null,
+      "source_document": "Ministry of Consumer Affairs, Food & Public Distribution Notification GSR 202(E)",
+      "official_url": "https://consumeraffairs.nic.in/acts-and-rules/legal-metrology/legal-metrology-packaged-commodities-rules-2011",
+      "summary": "Establishes baseline statutory declarations on packaged commodities including manufacturer/packer identity, net quantity in SI units, month/year of packing, retail price, and consumer helpline."
+    },
+    {
+      "version_id": "LMPC-2017-AMENDMENT",
+      "title": "Legal Metrology (Packaged Commodities) Amendment Rules, 2017",
+      "gazette_notification": "G.S.R. 629(E)",
+      "notification_date": "2017-06-23",
+      "effective_from": "2018-01-01",
+      "effective_to": null,
+      "source_document": "Gazette of India, Extraordinary, Part II, Section 3, Sub-section (i) No. 515",
+      "official_url": "https://consumeraffairs.nic.in/acts-and-rules/legal-metrology/legal-metrology-packaged-commodities-rules-2011",
+      "summary": "Mandates packaged commodity declarations on digital e-commerce platforms (Rule 6(10)), Country of Origin on imported goods, prohibition on dual MRP, and enlarged minimum font height."
+    },
+    {
+      "version_id": "LMPC-2021-AMENDMENT",
+      "title": "Legal Metrology (Packaged Commodities) Amendment Rules, 2021",
+      "gazette_notification": "G.S.R. 779(E) & G.S.R. 226(E)",
+      "notification_date": "2021-11-02",
+      "effective_from": "2022-12-01",
+      "effective_to": null,
+      "source_document": "Department of Consumer Affairs GSR 779(E) and extension notification GSR 226(E)",
+      "official_url": "https://consumeraffairs.nic.in/acts-and-rules/legal-metrology/legal-metrology-packaged-commodities-rules-2011",
+      "summary": "Introduces mandatory Unit Sale Price (USP) per gram, millimetre, or piece to empower price comparison across packaging sizes, and removes Schedule II pack size rigidity."
+    },
+    {
+      "version_id": "LMPC-2026-RULES",
+      "title": "Legal Metrology Packaged Commodities Harmonized Compliance Framework, 2026",
+      "gazette_notification": "Consolidated Statutory Framework 2026",
+      "notification_date": "2026-01-01",
+      "effective_from": "2026-01-01",
+      "effective_to": null,
+      "source_document": "Consolidated Legal Metrology Rules (2011 + 2017 + 2021/22 Amendments)",
+      "official_url": "https://consumeraffairs.nic.in",
+      "summary": "Full harmonized framework unifying domestic, imported, perishable, and e-commerce compliance rules with AI automated auditing standards."
+    }
+  ],
+  "clauses_index": {
+    "Rule 6(1)(a)": "Name and complete address of the manufacturer, or where manufacturer is not packer, the name and address of manufacturer and packer; for imported goods, name and address of importer.",
+    "Rule 6(1)(a) Proviso": "Country of origin declaration mandatory on all imported packages.",
+    "Rule 6(1)(b)": "Common or generic names of the commodity contained in the package.",
+    "Rule 6(1)(c)": "Net quantity, in terms of standard unit of weight or measure, of the commodity.",
+    "Rule 6(1)(d)": "The month and year in which the commodity is manufactured or pre-packed or imported.",
+    "Rule 6(1)(e)": "The maximum retail price (MRP) at which the commodity shall be sold to the ultimate consumer, inclusive of all taxes.",
+    "Rule 6(1)(f)": "Name, address, telephone number, and email address of the person who can be contacted by consumer in case of consumer complaints.",
+    "Rule 6(10)": "Obligations of e-commerce entities to display all mandatory label declarations on digital marketplaces.",
+    "Rule 6(11)": "Unit Sale Price (USP) declaration in terms of Rs. per g, ml, or piece rounded to two decimal places.",
+    "Rule 9": "Manner in which declarations shall be made (prominence, legibility, minimum height of numerals based on net quantity).",
+    "Rule 13": "Statement of units of weight, measure or number (Standard metric units g, kg, mg, ml, l, m, cm, mm, N, U; strict prohibition of gms, gm, kgs, ltrs)."
+  }
+}

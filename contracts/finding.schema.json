@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FindingSchema",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "inspection_id": { "type": "string", "format": "uuid" },
+    "rule_id": { "type": "string" },
+    "rule_version": { "type": "string" },
+    "clause_reference": { "type": "string" },
+    "requirement_title": { "type": "string" },
+    "ai_status": {
+      "type": "string",
+      "enum": ["PASS", "FAIL", "UNCERTAIN", "NOT_APPLICABLE"]
+    },
+    "inspector_status": {
+      "type": ["string", "null"],
+      "enum": ["PASS", "FAIL", "UNCERTAIN", "NOT_APPLICABLE", null]
+    },
+    "final_status": {
+      "type": "string",
+      "enum": ["PASS", "FAIL", "UNCERTAIN", "NOT_APPLICABLE"]
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFORMATIONAL"]
+    },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "explanation": { "type": "string" },
+    "uncertainty_reason": { "type": ["string", "null"] },
+    "observed_value": { "type": ["string", "null"] },
+    "expected_condition": { "type": "string" },
+    "evidence_references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "image_id": { "type": "string", "format": "uuid" },
+          "view_type": { "type": "string" },
+          "bbox": { "type": "array", "items": { "type": "number" } },
+          "ocr_snippet": { "type": "string" }
+        },
+        "required": ["image_id", "bbox"]
+      }
+    },
+    "inspector_comment": { "type": ["string", "null"] },
+    "inspector_id": { "type": ["string", "null"] },
+    "reviewed_at": { "type": ["string", "null"], "format": "date-time" },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "required": ["id", "inspection_id", "rule_id", "rule_version", "clause_reference", "requirement_title", "ai_status", "final_status", "severity", "confidence", "explanation", "expected_condition"]
+}
