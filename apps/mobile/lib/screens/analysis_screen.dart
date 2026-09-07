@@ -56,8 +56,9 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
     try {
       final res = await ApiService().triggerAnalysis(widget.inspectionId);
       if (!mounted) return;
+      final data = (res['data'] is Map<String, dynamic>) ? res['data'] as Map<String, dynamic> : res;
       setState(() {
-        _analysisResult = res;
+        _analysisResult = data;
         _isAnalyzing = false;
       });
     } catch (e) {
@@ -246,29 +247,56 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
               const SizedBox(height: 18),
 
               // Summary Counts Card
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.border),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Statutory Rules Breakdown', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+              Builder(
+                builder: (context) {
+                  int getRuleCount(String key, String fallbackKey) {
+                    if (_analysisResult == null) return 0;
+                    final summary = _analysisResult!['findings_summary'] as Map<String, dynamic>?;
+                    if (summary != null && summary.containsKey(key)) {
+                      final v = summary[key];
+                      return v is int ? v : int.tryParse('$v') ?? 0;
+                    }
+                    if (_analysisResult!.containsKey(fallbackKey)) {
+                      final v = _analysisResult![fallbackKey];
+                      return v is int ? v : int.tryParse('$v') ?? 0;
+                    }
+                    final findings = _analysisResult!['findings'] as List?;
+                    if (findings != null) {
+                      final target = key.toUpperCase();
+                      return findings.where((f) {
+                        final s = (f['final_status'] ?? f['ai_status'])?.toString().toUpperCase();
+                        if (target == 'NOT_APPLICABLE') return s == 'NOT_APPLICABLE' || s == 'N/A';
+                        return s == target;
+                      }).length;
+                    }
+                    return 0;
+                  }
+
+                  return Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildStatTile('PASS', '${_analysisResult?["findings_summary"]?["pass"] ?? 0}', AppColors.passGreen),
-                        _buildStatTile('FAIL', '${_analysisResult?["findings_summary"]?["fail"] ?? 0}', AppColors.failRed),
-                        _buildStatTile('UNCERTAIN', '${_analysisResult?["findings_summary"]?["uncertain"] ?? 0}', AppColors.uncertainAmber),
-                        _buildStatTile('N/A', '${_analysisResult?["findings_summary"]?["not_applicable"] ?? 0}', AppColors.naSlate),
+                        const Text('Statutory Rules Breakdown', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _buildStatTile('PASS', '${getRuleCount("pass", "passed_count")}', AppColors.passGreen),
+                            _buildStatTile('FAIL', '${getRuleCount("fail", "failed_count")}', AppColors.failRed),
+                            _buildStatTile('UNCERTAIN', '${getRuleCount("uncertain", "uncertain_count")}', AppColors.uncertainAmber),
+                            _buildStatTile('N/A', '${getRuleCount("not_applicable", "na_count")}', AppColors.naSlate),
+                          ],
+                        ),
                       ],
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
               const SizedBox(height: 20),
 

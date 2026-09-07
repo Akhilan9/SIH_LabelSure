@@ -24,18 +24,18 @@ class ApiService {
     if (_token != null) {
       headers['Authorization'] = 'Bearer $_token';
     }
+    headers['bypass-tunnel-reminder'] = 'true';
     return headers;
   }
 
-  // 1. Authentication
   // 1. Authentication
   Future<UserModel> login(String username, String password) async {
     try {
       final res = await http.post(
         Uri.parse('$_baseUrl/api/auth/login'),
-        headers: {'Content-Type': 'application/json'},
+        headers: _headers(),
         body: jsonEncode({'username': username, 'password': password}),
-      ).timeout(const Duration(seconds: 4));
+      ).timeout(const Duration(seconds: 12));
 
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);
@@ -64,7 +64,7 @@ class ApiService {
     final res = await http.get(
       Uri.parse('$_baseUrl/api/inspections'),
       headers: _headers(),
-    ).timeout(const Duration(seconds: 5));
+    ).timeout(const Duration(seconds: 15));
 
     if (res.statusCode == 200) {
       final list = jsonDecode(res.body) as List;
@@ -152,7 +152,7 @@ class ApiService {
         Uri.parse('$_baseUrl/api/inspections'),
         headers: _headers(),
         body: jsonEncode(payload),
-      ).timeout(const Duration(seconds: 4));
+      ).timeout(const Duration(seconds: 15));
 
       if (res.statusCode == 201) {
         return InspectionModel.fromJson(jsonDecode(res.body));
@@ -180,7 +180,7 @@ class ApiService {
       Uri.parse('$_baseUrl/api/inspections/$inspectionId/context'),
       headers: _headers(),
       body: jsonEncode(payload),
-    ).timeout(const Duration(seconds: 5));
+    ).timeout(const Duration(seconds: 15));
 
     if (res.statusCode != 200) {
       throw Exception('Failed to update product context');
@@ -201,6 +201,7 @@ class ApiService {
       if (_token != null) {
         request.headers['Authorization'] = 'Bearer $_token';
       }
+      request.headers['bypass-tunnel-reminder'] = 'true';
       request.fields['view_type'] = viewType;
       request.files.add(http.MultipartFile.fromBytes(
         'file',
@@ -208,7 +209,7 @@ class ApiService {
         filename: fileName,
       ));
 
-      final streamedRes = await request.send().timeout(const Duration(seconds: 6));
+      final streamedRes = await request.send().timeout(const Duration(seconds: 30));
       final res = await http.Response.fromStream(streamedRes);
 
       if (res.statusCode == 201) {
@@ -236,10 +237,11 @@ class ApiService {
       if (_token != null) {
         request.headers['Authorization'] = 'Bearer $_token';
       }
+      request.headers['bypass-tunnel-reminder'] = 'true';
       request.fields['view_type'] = viewType;
       request.files.add(await http.MultipartFile.fromPath('file', filePath));
 
-      final streamedRes = await request.send().timeout(const Duration(seconds: 6));
+      final streamedRes = await request.send().timeout(const Duration(seconds: 30));
       final res = await http.Response.fromStream(streamedRes);
 
       if (res.statusCode == 201) {
@@ -264,7 +266,7 @@ class ApiService {
       final res = await http.post(
         Uri.parse('$_baseUrl/api/inspections/$inspectionId/analyze'),
         headers: _headers(),
-      ).timeout(const Duration(seconds: 6));
+      ).timeout(const Duration(seconds: 35));
 
       if (res.statusCode == 200) {
         return jsonDecode(res.body);
@@ -280,6 +282,12 @@ class ApiService {
       'passed_count': 4,
       'failed_count': 2,
       'uncertain_count': 0,
+      'findings_summary': {
+        'pass': 4,
+        'fail': 2,
+        'uncertain': 0,
+        'not_applicable': 0,
+      },
       'findings': [
         {
           'id': 'f_offline_1',
@@ -317,7 +325,7 @@ class ApiService {
       final res = await http.get(
         Uri.parse('$_baseUrl/api/inspections/$inspectionId/rulelens'),
         headers: _headers(),
-      ).timeout(const Duration(seconds: 8));
+      ).timeout(const Duration(seconds: 25));
 
       if (res.statusCode == 200) {
         return jsonDecode(res.body);
@@ -561,7 +569,8 @@ class ApiService {
     try {
       final res = await http.get(
         Uri.parse('$_baseUrl/health'),
-      ).timeout(const Duration(seconds: 3));
+        headers: {'bypass-tunnel-reminder': 'true'},
+      ).timeout(const Duration(seconds: 6));
       return res.statusCode == 200;
     } catch (_) {
       return false;
@@ -711,6 +720,7 @@ class ApiService {
       if (_token != null) {
         request.headers['Authorization'] = 'Bearer $_token';
       }
+      request.headers['bypass-tunnel-reminder'] = 'true';
       if (commodityName != null) request.fields['commodity_name'] = commodityName;
       if (brandName != null) request.fields['brand_name'] = brandName;
       if (mrp != null) request.fields['mrp'] = mrp;
@@ -722,7 +732,7 @@ class ApiService {
         filename: fileName,
       ));
 
-      final streamedRes = await request.send().timeout(const Duration(seconds: 25));
+      final streamedRes = await request.send().timeout(const Duration(seconds: 35));
       final res = await http.Response.fromStream(streamedRes);
 
       if (res.statusCode == 201) {

@@ -1,7 +1,11 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../core/api_service.dart';
 import '../core/constants.dart';
 import '../core/storage_service.dart';
+import '../core/sync_manager.dart';
 import '../models/inspection.dart';
 import 'inspector_review_screen.dart';
 
@@ -25,6 +29,8 @@ class _RuleLensScreenState extends State<RuleLensScreen> {
   Map<String, dynamic>? _ruleLensData;
   MobileFinding? _selectedFinding;
   String? _primaryImageUrl;
+  String? _localImagePath;
+  Uint8List? _localImageBytes;
 
   @override
   void initState() {
@@ -53,6 +59,19 @@ class _RuleLensScreenState extends State<RuleLensScreen> {
           final rawPath = images[0]['processed_path'] ?? images[0]['storage_path'] ?? '';
           final baseUrl = StorageService().baseUrl;
           _primaryImageUrl = rawPath.startsWith('http') ? rawPath : '$baseUrl$rawPath';
+        }
+
+        // Local evidence fallback from SyncManager
+        final localInsp = SyncManager().getInspection(widget.inspectionId);
+        if (localInsp != null && localInsp.images.isNotEmpty) {
+          final firstImg = localInsp.images.first;
+          if (firstImg.filePath != null && File(firstImg.filePath!).existsSync()) {
+            _localImagePath = firstImg.filePath;
+          } else if (firstImg.base64Data != null) {
+            try {
+              _localImageBytes = base64Decode(firstImg.base64Data!);
+            } catch (_) {}
+          }
         }
         _isLoading = false;
       });
@@ -101,9 +120,31 @@ class _RuleLensScreenState extends State<RuleLensScreen> {
                               fit: BoxFit.contain,
                               width: double.infinity,
                               height: 260,
-                              errorBuilder: (_, __, ___) => const Center(
-                                child: Text('Packaging photograph offline', style: TextStyle(color: Colors.white54)),
-                              ),
+                              headers: const {'bypass-tunnel-reminder': 'true'},
+                              errorBuilder: (_, __, ___) {
+                                if (_localImagePath != null) {
+                                  return Image.file(File(_localImagePath!), fit: BoxFit.contain);
+                                } else if (_localImageBytes != null) {
+                                  return Image.memory(_localImageBytes!, fit: BoxFit.contain);
+                                }
+                                return const Center(
+                                  child: Text('Packaging photograph offline', style: TextStyle(color: Colors.white54)),
+                                );
+                              },
+                            )
+                          else if (_localImagePath != null)
+                            Image.file(
+                              File(_localImagePath!),
+                              fit: BoxFit.contain,
+                              width: double.infinity,
+                              height: 260,
+                            )
+                          else if (_localImageBytes != null)
+                            Image.memory(
+                              _localImageBytes!,
+                              fit: BoxFit.contain,
+                              width: double.infinity,
+                              height: 260,
                             )
                           else
                             const Center(

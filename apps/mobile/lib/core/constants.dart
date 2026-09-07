@@ -43,8 +43,9 @@ class AppConstants {
   static const String appTagline = 'Legal Metrology Compliance Inspector';
   
   // Default Backend URL
-  // 192.168.0.219 is PC LAN IP for physical Android phone, 127.0.0.1 for web and desktop
-  static String get defaultBaseUrl => kIsWeb ? 'http://127.0.0.1:8000' : 'http://192.168.0.219:8000';
+  // https://labelsure-ai.loca.lt is public live tunnel directly to PC backend with RapidOCR!
+  static String get defaultBaseUrl => kIsWeb ? 'http://127.0.0.1:8000' : 'https://labelsure-ai.loca.lt';
+  static const String tunnelBaseUrl = 'https://labelsure-ai.loca.lt';
   static const String desktopBaseUrl = 'http://127.0.0.1:8000';
   static const String lanBaseUrl = 'http://192.168.0.219:8000';
   static const String emulatorBaseUrl = 'http://10.0.2.2:8000';
