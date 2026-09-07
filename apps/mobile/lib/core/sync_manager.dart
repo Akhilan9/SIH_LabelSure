@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 import 'api_service.dart';
+import 'storage_service.dart';
 
 /// 8 Official Lifecycle States for Legal Metrology Packaged Commodity Inspections
 class SyncState {
@@ -161,7 +162,7 @@ class SyncManager extends ChangeNotifier {
   final Map<String, OfflineInspection> _inspections = {};
   final String _clientId = 'mobile-officer-${const Uuid().v4().substring(0, 8)}';
 
-  bool _isOnline = true;
+  bool _isOnline = false; // Safe default: offline until server responds
   bool? _manualOnlineOverride;
   bool _isSyncing = false;
   Timer? _monitorTimer;
@@ -188,6 +189,10 @@ class SyncManager extends ChangeNotifier {
 
   void _startConnectivityMonitor() {
     _monitorTimer?.cancel();
+    ApiService().checkHealth().then((h) {
+      _isOnline = h;
+      notifyListeners();
+    });
     _monitorTimer = Timer.periodic(const Duration(seconds: 10), (_) async {
       final wasOnline = isOnline;
       final healthy = await ApiService().checkHealth();
@@ -200,6 +205,11 @@ class SyncManager extends ChangeNotifier {
         }
       }
     });
+  }
+
+  void clearEmptyDrafts() {
+    _inspections.removeWhere((id, insp) => insp.images.isEmpty && insp.status == SyncState.draft);
+    notifyListeners();
   }
 
   // 1. Create Offline Inspection (status: DRAFT)
@@ -284,7 +294,16 @@ class SyncManager extends ChangeNotifier {
 
   // 5. Synchronize All Pending Items with Server
   Future<void> synchronizePending() async {
-    if (_isSyncing || !isOnline) return;
+    if (_isSyncing) return;
+
+    final healthy = await ApiService().checkHealth();
+    if (!healthy) {
+      _isOnline = false;
+      _isSyncing = false;
+      notifyListeners();
+      return;
+    }
+    _isOnline = true;
     _isSyncing = true;
     notifyListeners();
 
@@ -302,13 +321,22 @@ class SyncManager extends ChangeNotifier {
 
   Future<void> retryOperation(String localId) async {
     final insp = _inspections[localId];
-    if (insp != null && isOnline) {
-      insp.status = SyncState.queued;
-      insp.syncError = null;
+    if (insp == null) return;
+
+    final healthy = await ApiService().checkHealth();
+    if (!healthy) {
+      _isOnline = false;
+      insp.syncError = 'Server unreachable at ${StorageService().baseUrl}. Check WiFi or Settings.';
       notifyListeners();
-      await _syncSingleInspection(insp);
-      notifyListeners();
+      return;
     }
+
+    _isOnline = true;
+    insp.status = SyncState.queued;
+    insp.syncError = null;
+    notifyListeners();
+    await _syncSingleInspection(insp);
+    notifyListeners();
   }
 
   Future<void> retryAllFailed() async {

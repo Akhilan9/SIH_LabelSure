@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/api_service.dart';
 import '../core/constants.dart';
 import '../core/storage_service.dart';
 import 'login_screen.dart';
@@ -13,6 +14,9 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   late TextEditingController _urlController;
   final StorageService _storage = StorageService();
+  bool _isTesting = false;
+  String? _testResult;
+  bool? _testSuccess;
 
   @override
   void initState() {
@@ -28,6 +32,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
         SnackBar(content: Text('Server endpoint updated to: ${_storage.baseUrl}')),
       );
     }
+  }
+
+  Future<void> _testConnection() async {
+    _saveUrl();
+    setState(() {
+      _isTesting = true;
+      _testResult = null;
+      _testSuccess = null;
+    });
+
+    final stopwatch = Stopwatch()..start();
+    final ok = await ApiService().checkHealth();
+    stopwatch.stop();
+
+    if (!mounted) return;
+    setState(() {
+      _isTesting = false;
+      _testSuccess = ok;
+      _testResult = ok
+          ? 'Connected successfully (${stopwatch.elapsedMilliseconds}ms)'
+          : 'Could not connect to ${_storage.baseUrl}. Ensure PC is on same WiFi and server is running.';
+    });
   }
 
   void _handleLogout() {
@@ -116,6 +142,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   ),
                 ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 6,
+                  children: [
+                    ActionChip(
+                      avatar: const Icon(Icons.wifi, size: 14),
+                      label: const Text('PC WiFi (192.168.0.219)', style: TextStyle(fontSize: 11)),
+                      onPressed: () {
+                        setState(() {
+                          _urlController.text = 'http://192.168.0.219:8000';
+                          _storage.setBaseUrl('http://192.168.0.219:8000');
+                        });
+                      },
+                    ),
+                    ActionChip(
+                      avatar: const Icon(Icons.phone_android, size: 14),
+                      label: const Text('Emulator (10.0.2.2)', style: TextStyle(fontSize: 11)),
+                      onPressed: () {
+                        setState(() {
+                          _urlController.text = 'http://10.0.2.2:8000';
+                          _storage.setBaseUrl('http://10.0.2.2:8000');
+                        });
+                      },
+                    ),
+                    ActionChip(
+                      avatar: const Icon(Icons.computer, size: 14),
+                      label: const Text('Localhost (127.0.0.1)', style: TextStyle(fontSize: 11)),
+                      onPressed: () {
+                        setState(() {
+                          _urlController.text = AppConstants.desktopBaseUrl;
+                          _storage.setBaseUrl(AppConstants.desktopBaseUrl);
+                        });
+                      },
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -124,22 +187,53 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                       ),
-                      child: const Text('Save Server URL'),
+                      child: const Text('Save URL'),
                     ),
-                    const SizedBox(width: 10),
-                    OutlinedButton(
-                      onPressed: () {
-                        setState(() {
-                          _urlController.text = AppConstants.desktopBaseUrl;
-                          _storage.setBaseUrl(AppConstants.desktopBaseUrl);
-                        });
-                      },
-                      child: const Text('Reset Localhost', style: TextStyle(fontSize: 12)),
+                    const SizedBox(width: 8),
+                    OutlinedButton.icon(
+                      onPressed: _isTesting ? null : _testConnection,
+                      icon: _isTesting
+                          ? const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2))
+                          : const Icon(Icons.network_check, size: 16),
+                      label: Text(_isTesting ? 'Testing...' : 'Test Connection', style: const TextStyle(fontSize: 12)),
                     ),
                   ],
                 ),
+                if (_testResult != null) ...[
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: _testSuccess == true ? AppColors.passBg : AppColors.failBg,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: _testSuccess == true ? AppColors.passBorder : AppColors.failBorder,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          _testSuccess == true ? Icons.check_circle : Icons.error_outline,
+                          size: 16,
+                          color: _testSuccess == true ? AppColors.passGreen : AppColors.failRed,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _testResult!,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: _testSuccess == true ? AppColors.passGreen : AppColors.failRed,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
